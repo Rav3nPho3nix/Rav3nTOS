@@ -1,0 +1,26 @@
+x-base: &base
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: rav3ntos_dev
+  volumes:
+    - .:/build
+  working_dir: /build
+  environment:
+    DOCKER_ENV: 1
+
+services:
+  env:
+    <<: *base
+    container_name: rav3ntos_env
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+
+  make:
+    <<: *base
+    command: make
+
+  clean:
+    <<: *base
+    command: make clean
