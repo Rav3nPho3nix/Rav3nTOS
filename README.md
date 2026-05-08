@@ -1,27 +1,46 @@
 # Rav3nTOS
 My own RTOS
 
-## Docker to cross compile
-By using **Docker**, you can compile Rav3nTOS on any computer.
-<br>
+# ToDo
+- [X] Linker
+- [X] Vector table
+- [X] Reset Handler
+- [ ] UART
+- [ ] SysTick
+- [ ] Task structure
+- [ ] Context switching
+- [ ] Round robin
+- [ ] IPC & Synchronisation
+- [ ] Separation between kernel & arch & bsp
+- [ ] Microkernel
+- [ ] MPU Isolation
+- [ ] Sandboxing
+- [ ] Stack canaries
+- [ ] EDF Scheduler
+- [ ] Post quantum crypto
+
+# Compilation
+Rav3nTOS is compiled using **GNU Make** inside a **Docker** container. By using Docker, every computer can cross compile for all supported platforms.
+
+To change the platform target, you only need to modify the following Makefile parameters :
+```bash
+ARCH_DIR    # Architecture directory
+BSP_DIR     # Board support package directory
+CC          # Cross compiler
+LD          # Linker
+ADD_CFLAGS  # Added flags depending on target architecture
+```
+
 There are 3 ways to interact with the docker container :
-<br>
-- **Compilation** : `docker compose run --rm make` (only execute `make`)
+
+- **Compilation** : `docker compose run --rm build` (only execute `make`)
 - **Cleaning** : `docker compose run --rm clean` (only execute `make clean`)
-- **Entering** : `docker compose run --rm env`
-<br>
-The last option let you run any specific make target :
+- **Entering** : `docker compose run --rm enter` (enter inside the docker container)
+
+# ARM targets emulation (optionnal)
+I use **Renode** to emulate ARM targets.
+
+Then run the `./bsp/renode_<board>/renode.resc` script file to automatically load the compiled `.elf` file :
+```bash
+renode -e 'include @bsp/renode_<board>/renode.resc'
 ```
-# Compile
-make
-
-# Clean
-make clean
-
-# etc
-make your_target
-```
-
-***Note : All the make commands (except help) must be ran inside the docker container***
-
-## Renode to emulate on PC (optionnal)
