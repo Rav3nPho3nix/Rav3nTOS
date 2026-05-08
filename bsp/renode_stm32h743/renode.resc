@@ -1,0 +1,9 @@
+using sysbus
+
+mach create
+
+machine LoadPlatformDescription @platforms/cpus/stm32h743.repl
+
+sysbus LoadELF @build/rav3ntos.elf
+
+start
