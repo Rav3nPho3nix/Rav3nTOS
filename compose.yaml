@@ -10,7 +10,7 @@ x-base: &base
     DOCKER_ENV: 1
 
 services:
-  env:
+  enter:
     <<: *base
     container_name: rav3ntos_env
     command: /bin/bash
