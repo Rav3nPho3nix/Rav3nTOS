@@ -17,7 +17,7 @@ services:
     stdin_open: true
     tty: true
 
-  make:
+  build:
     <<: *base
     command: make
 
