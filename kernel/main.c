@@ -1,10 +1,8 @@
-#include <stdint.h>
-#include <stdbool.h>
+#include "../includes/types.h"
 
 volatile uint32_t counter = 0;
 
-int main(void)
-{
+int main(void) {
     while (1) {
         counter++;
     }
