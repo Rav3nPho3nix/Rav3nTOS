@@ -4,6 +4,12 @@ mach create
 
 machine LoadPlatformDescription @platforms/cpus/stm32h743.repl
 
+emulation CreateServerSocketTerminal 1234 "term"
+
+connector Connect usart1 term
+
 sysbus LoadELF @build/rav3ntos.elf
+
+logLevel 3
 
 start
