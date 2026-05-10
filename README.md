@@ -19,10 +19,24 @@ My own RTOS
 - [ ] EDF Scheduler
 - [ ] Post quantum crypto
 
+# Requirements
+- Docker
+- Docker compose
+- Renode (optional : for ARM emulation)
+
 # Compilation
 Rav3nTOS is compiled using **GNU Make** inside a **Docker** container. By using Docker, every computer can cross compile for all supported platforms.
 
-To change the platform target, you only need to modify the following Makefile parameters :
+To change the platform target, you need to modify the Dockerfile packages to install your architecture based gcc.
+
+For example, to compile for an `arm` target, i use :
+```bash
+gcc-arm-none-eabi
+binutils-arm-none-eabi
+libnewlib-arm-none-eabi
+```
+
+Then, you also need to modify the following Makefile parameters to match your installed packages :
 ```bash
 ARCH_DIR    # Architecture directory
 BSP_DIR     # Board support package directory
@@ -37,10 +51,12 @@ There are 3 ways to interact with the docker container :
 - **Cleaning** : `docker compose run --rm clean` (only execute `make clean`)
 - **Entering** : `docker compose run --rm enter` (enter inside the docker container)
 
-# ARM targets emulation (optionnal)
+**<em>Note : `docker compose` require `root` permissions to run. This means that the generated files from compilation (.elf & .o files) are own by `root`. You can delete the `./build` directory using `docker compose run --rm clean` or doing it 'by hands' using `root rm`.</em>** 
+
+# ARM targets emulation (optional)
 I use **Renode** to emulate ARM targets.
 
-Then run the `./bsp/renode_<board>/renode.resc` script file to automatically load the compiled `.elf` file :
+Run the `./bsp/renode_<board>/renode.resc` script file to automatically load the compiled `.elf` file and boot into the RTOS :
 ```bash
 renode -e 'include @bsp/renode_<board>/renode.resc'
 ```
