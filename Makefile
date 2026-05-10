@@ -26,8 +26,25 @@ LD = arm-none-eabi-gcc
 ADD_CFLAGS = -mcpu=cortex-m7 -mthumb
 ###
 
+# Sources files
+SRCS = \
+	kernel/main.c \
+	$(ARCH_DIR)/vectors.c \
+	$(ARCH_DIR)/startup.s \
+	$(BSP_DIR)/platform.c \
+	$(BSP_DIR)/usart_ll.c \
+	drivers/usart/usart.c
+
+# Includes
+INCLUDES = \
+	-Iincludes \
+	-Iincludes/cmsis/core \
+	-Iincludes/cmsis/device \
+	-I$(BSP_DIR) \
+	-Idrivers/usart
+
 # Defaults flags
-CFLAGS = -O0 -g -ffreestanding -nostdlib $(ADD_CFLAGS)
+CFLAGS = -O0 -g -ffreestanding -nostdlib $(ADD_CFLAGS) $(INCLUDES)
 LDFLAGS = -nostdlib -T $(BSP_DIR)/linker.ld
 
 TARGET = rav3ntos
@@ -35,13 +52,6 @@ BUILD_DIR = build
 
 # Default target
 .DEFAULT_GOAL := compilation
-
-# Sources files
-SRCS = \
-	kernel/main.c \
-	$(ARCH_DIR)/vectors.c \
-	$(ARCH_DIR)/startup.s
-
 
 # Objects files
 OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
@@ -51,20 +61,17 @@ OBJS := $(OBJS:%.s=$(BUILD_DIR)/%.o)
 compilation: $(BUILD_DIR)/$(TARGET).elf
 	@echo "> Build OK"
 
-$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: %.s | $(BUILD_DIR)
+$(BUILD_DIR)/%.o: %.s
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/$(TARGET).elf: $(OBJS)
 	$(LD) $(OBJS) $(LDFLAGS) -o $@
 	@echo "> Link OK"
-
-# Create build directory
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)/kernel
-	mkdir -p $(BUILD_DIR)/$(ARCH_DIR)
 
 # Clean build dir
 clean:
