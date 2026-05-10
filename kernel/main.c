@@ -1,9 +1,13 @@
-#include "../includes/types.h"
+#include <stdint.h>
 
-volatile uint32_t counter = 0;
+#include "platform.h"
+#include "usart.h"
+
+#include "stm32h743xx.h"
 
 int main(void) {
-    while (1) {
-        counter++;
-    }
+    platform_init();
+
+    usart_putchar('O');
+    usart_putchar('K');
 }
