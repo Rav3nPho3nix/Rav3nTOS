@@ -1,10 +1,6 @@
-#include "../../includes/platform.h"
+#include "platform.h"
+#include "usart.h"
 
 void platform_init(void) {
-    /* later:
-       clocks
-       uart
-       systick
-       etc.
-    */
+    usart_init(115200U);
 }
