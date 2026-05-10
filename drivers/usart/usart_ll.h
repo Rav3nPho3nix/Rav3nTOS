@@ -10,10 +10,12 @@
 // Taking baudrate in parameter
 void usart_ll_init(uint32_t baudrate);
 
-// Low level putChar for USART
-usart_status_t usart_ll_putchar(char);
+// Low level WriteChar for USART
+usart_status_t usart_ll_write_char(char);
 
-// Low level getChar for USART
-usart_status_t usart_ll_getchar(char*);
+// Low level ReadChar for USART
+usart_status_t usart_ll_read_char(char*);
 
+// Low level WriteString for USART
+usart_status_t usart_ll_write_string(const char*);
 #endif

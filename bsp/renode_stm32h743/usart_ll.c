@@ -35,7 +35,7 @@ void usart_ll_init(uint32_t baudrate) {
     USART1->CR1 |= USART_CR1_TE | USART_CR1_RE;
 }
 
-usart_status_t usart_ll_putchar(char c) {
+usart_status_t usart_ll_write_char(char c) {
     // If TX FIFO is full
     if ((USART1->ISR & USART_ISR_TXE_TXFNF) == 0U) {
         return USART_STATUS_TX_FULL;
@@ -44,7 +44,7 @@ usart_status_t usart_ll_putchar(char c) {
     return USART_STATUS_OK;
 }
 
-usart_status_t usart_ll_getchar(char* ptr_c) {
+usart_status_t usart_ll_read_char(char* ptr_c) {
     // If ptr_c is NULL
     if (ptr_c == NULL) {
         return USART_STATUS_ERROR;
@@ -56,5 +56,25 @@ usart_status_t usart_ll_getchar(char* ptr_c) {
     }
 
     *ptr_c = (char)(USART1->RDR & 0xFFU);
+    return USART_STATUS_OK;
+}
+
+usart_status_t usart_ll_write_string(const char* str) {
+    // If bad pointer
+    if (str == NULL) {
+        return USART_STATUS_ERROR;
+    }
+
+    // While the string is not empty
+    while (*str != '\0') {
+        usart_status_t status = usart_ll_write_char(*str);
+
+        // Propagating the error
+        if (status != USART_STATUS_OK) {
+            return status;
+        }
+        str++;
+    }
+
     return USART_STATUS_OK;
 }

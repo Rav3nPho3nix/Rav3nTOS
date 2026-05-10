@@ -10,10 +10,13 @@
 // Taking baudrate in parameter
 void usart_init(uint32_t baudrate);
 
-// PutChar for USART
-usart_status_t usart_putchar(char);
+// WriteChar for USART
+usart_status_t usart_write_char(char);
 
-// GetChar for USART
-usart_status_t usart_getchar(char*);
+// ReadChar for USART
+usart_status_t usart_read_char(char*);
+
+// WriteString for USART
+usart_status_t usart_write_string(const char*);
 
 #endif
