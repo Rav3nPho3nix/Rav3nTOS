@@ -33,7 +33,8 @@ SRCS = \
 	$(ARCH_DIR)/startup.s \
 	$(BSP_DIR)/platform.c \
 	$(BSP_DIR)/usart_ll.c \
-	drivers/usart/usart.c
+	drivers/usart/usart.c \
+	services/debug/debug.c
 
 # Includes
 INCLUDES = \
@@ -41,7 +42,8 @@ INCLUDES = \
 	-Iincludes/cmsis/core \
 	-Iincludes/cmsis/device \
 	-I$(BSP_DIR) \
-	-Idrivers/usart
+	-Idrivers/usart \
+	-Ikernel
 
 # Defaults flags
 CFLAGS = -O0 -g -ffreestanding -nostdlib $(ADD_CFLAGS) $(INCLUDES)
