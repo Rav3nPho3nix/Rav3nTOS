@@ -52,7 +52,7 @@ usart_status_t usart_ll_read_char(char* ptr_c) {
 
     // If RX FIFO is empty
     if ((USART1->ISR & USART_ISR_RXNE_RXFNE) == 0U) {
-        return USART_STATUS_OK;
+        return USART_STATUS_RX_EMPTY;
     }
 
     *ptr_c = (char)(USART1->RDR & 0xFFU);
