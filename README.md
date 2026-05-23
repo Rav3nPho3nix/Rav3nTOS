@@ -5,19 +5,17 @@ My own RTOS
 - [X] Linker
 - [X] Vector table
 - [X] Reset Handler
-- [ ] UART
+- [X] USART
 - [ ] SysTick
 - [ ] Task structure
 - [ ] Context switching
 - [ ] Round robin
 - [ ] IPC & Synchronisation
-- [ ] Separation between kernel & arch & bsp
 - [ ] Microkernel
 - [ ] MPU Isolation
 - [ ] Sandboxing
 - [ ] Stack canaries
 - [ ] EDF Scheduler
-- [ ] Post quantum crypto
 
 # Requirements
 - Docker
@@ -59,4 +57,9 @@ I use **Renode** to emulate ARM targets.
 Run the `./bsp/renode_<board>/renode.resc` script file to automatically load the compiled `.elf` file and boot into the RTOS :
 ```bash
 renode -e 'include @bsp/renode_<board>/renode.resc'
+```
+
+Then open another terminal and connect to your `1234` port to see outputs :
+```bash
+nc 127.0.0.1 1234
 ```
