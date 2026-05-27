@@ -1,6 +1,6 @@
 #include "debug.h"
 #include "usart.h"
 
-void debug_write(const char* str) {
-    usart_write_string(str);
+void debug_write(const char* msg) {
+    usart_write_string(msg);
 }
