@@ -1,5 +1,7 @@
 #include "platform.h"
 
+#include "usart.h"
+
 void platform_init(void) {
-    // Don't do anything for the moment
+    usart_init(115200U);
 }
