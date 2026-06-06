@@ -102,15 +102,7 @@ continue
 
 If you want to reflash the microcontroller, you can use the `load` command inside gdb.
 
-# ARM targets emulation (optional)
-I use **Renode** to emulate ARM targets.
-
-Run the `./bsp/renode_<board>/renode.resc` script file to automatically load the compiled `.elf` file and boot into the RTOS :
+# For STM32 cards with ST Link
 ```bash
-renode -e 'include @bsp/renode_<board>/renode.resc'
-```
-
-Then open another terminal and connect to your `1234` port to see outputs :
-```bash
-nc 127.0.0.1 1234
+minicom -D /dev/ttyACM0 -b 115200
 ```
