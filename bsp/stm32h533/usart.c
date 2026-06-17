@@ -25,9 +25,9 @@ void usart_init(uint32_t baudrate) {
     GPIOA->AFR[0] |= (7 << GPIO_AFRL_AFSEL2_Pos) | (7 << GPIO_AFRL_AFSEL3_Pos);
 
     // Set up BBR
-    // 64 Mhz of frequency
-    // BBR = (64,000,000) / BaudRate
-    USART2->BRR = 64000000U / baudrate;
+    // 32 Mhz of frequency by default
+    // BBR = (32,000,000) / BaudRate
+    USART2->BRR = 32000000U / baudrate;
 
     // Enable USART2
     USART2->CR1 = USART_CR1_UE;
@@ -36,11 +36,7 @@ void usart_init(uint32_t baudrate) {
 }
 
 usart_status_t usart_write_char(char c) {
-    // If TX FIFO is full
-    // if ((USART2->ISR & USART_ISR_TXE_TXFNF) == 0U) {
-    //     return USART_STATUS_TX_FULL;
-    // }
-
+    // Wait until TX is not full
     while ((USART2->ISR & USART_ISR_TXE_TXFNF) == 0U);
     
     USART2->TDR = (uint8_t)(c);
@@ -53,10 +49,8 @@ usart_status_t usart_read_char(char* ptr_c) {
         return USART_STATUS_ERROR;
     }
 
-    // If RX FIFO is empty
-    if ((USART2->ISR & USART_ISR_RXNE_RXFNE) == 0U) {
-        return USART_STATUS_RX_EMPTY;
-    }
+    // Wait until RX is not empty
+    while ((USART2->ISR & USART_ISR_RXNE_RXFNE) == 0U);
 
     *ptr_c = (char)(USART2->RDR & 0xFFU);
     return USART_STATUS_OK;
@@ -68,15 +62,9 @@ usart_status_t usart_write_string(const char* str) {
         return USART_STATUS_ERROR;
     }
 
-    // While the string is not empty
+    // Write each character
     while (*str != '\0') {
-        usart_status_t status = usart_write_char(*str);
-
-        // Propagating the error
-        if (status != USART_STATUS_OK) {
-            return status;
-        }
-        str++;
+        usart_write_char(*(str++));
     }
 
     return USART_STATUS_OK;
