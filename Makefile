@@ -8,13 +8,17 @@ ifndef DOCKER_ENV
 	@exit 1
 else
 
+# Build
+TARGET = rav3ntos
+BUILD_DIR = build
+ELF = $(TARGET).elf
 
-### TO CHANGE DEPENDING ON TARGET PLATFORM ###
+###### TO CHANGE DEPENDING ON TARGET PLATFORM ######
 # Architecture directory
-ARCH_DIR = arch/arm/cortex-m7
+ARCH_DIR = arch/arm/cortex-m33
 
 # Board support package directory
-BSP_DIR = bsp/renode_stm32h743
+BSP_DIR = bsp/stm32h533
 
 # Cross compiler
 CC = arm-none-eabi-gcc
@@ -23,18 +27,23 @@ CC = arm-none-eabi-gcc
 LD = arm-none-eabi-gcc
 
 # Added flags depending on target architecture
-ADD_CFLAGS = -mcpu=cortex-m7 -mthumb
-###
+ADD_CFLAGS = -mcpu=cortex-m33 -mthumb
+######
 
 # Sources files
 SRCS = \
 	kernel/main.c \
-	$(ARCH_DIR)/vectors.c \
+	kernel/clock.c \
+\
 	$(ARCH_DIR)/startup.s \
+	$(ARCH_DIR)/systick.c \
+	$(ARCH_DIR)/arch_timer.c \
+\
 	$(BSP_DIR)/platform.c \
-	$(BSP_DIR)/usart_ll.c \
-	drivers/usart/usart.c \
-	services/debug/debug.c
+	$(BSP_DIR)/usart.c \
+\
+	services/debug/debug.c \
+	services/log/log.c
 
 # Includes
 INCLUDES = \
@@ -42,15 +51,13 @@ INCLUDES = \
 	-Iincludes/cmsis/core \
 	-Iincludes/cmsis/device \
 	-I$(BSP_DIR) \
+	-I$(ARCH_DIR) \
 	-Idrivers/usart \
 	-Ikernel
 
 # Defaults flags
 CFLAGS = -O0 -g -ffreestanding -nostdlib $(ADD_CFLAGS) $(INCLUDES)
 LDFLAGS = -nostdlib -T $(BSP_DIR)/linker.ld
-
-TARGET = rav3ntos
-BUILD_DIR = build
 
 # Default target
 .DEFAULT_GOAL := compilation
@@ -60,7 +67,7 @@ OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
 OBJS := $(OBJS:%.s=$(BUILD_DIR)/%.o)
 
 # Compilation
-compilation: $(BUILD_DIR)/$(TARGET).elf
+compilation: $(BUILD_DIR)/$(ELF)
 	@echo "> Build OK"
 
 $(BUILD_DIR)/%.o: %.c
@@ -71,7 +78,7 @@ $(BUILD_DIR)/%.o: %.s
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/$(TARGET).elf: $(OBJS)
+$(BUILD_DIR)/$(ELF): $(OBJS)
 	$(LD) $(OBJS) $(LDFLAGS) -o $@
 	@echo "> Link OK"
 
