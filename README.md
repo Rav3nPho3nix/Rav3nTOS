@@ -1,12 +1,12 @@
 # Rav3nTOS
-My own RTOS
+My own RTOS currently supporting a STM32 NUCLEO H533RE
 
 # ToDo
 - [X] Linker
 - [X] Vector table
 - [X] Reset Handler
 - [X] USART
-- [ ] SysTick
+- [X] SysTick
 - [ ] Task structure
 - [ ] Context switching
 - [ ] Round robin
@@ -22,7 +22,6 @@ My own RTOS
 - Docker compose
 - probe-rs
 - gdb-multiarch
-- Renode (optional : for ARM emulation)
 
 # Software environment
 
@@ -106,3 +105,19 @@ If you want to reflash the microcontroller, you can use the `load` command insid
 ```bash
 minicom -D /dev/ttyACM0 -b 115200
 ```
+
+# Documentation 
+
+## `./arch` 
+
+`./arch` first define eveything necessary to the cpu to start, for example the `startup.s` file.
+
+Then, it need to specify `arch.h` file what header file he uses. For my Nucle H533RE, it use `core_cm33.h` header file. Also, it use the `bsp.h` file, specified inside the selectionned `./bsp` board (see more later).
+
+## `./bsp`
+
+`./bsp` embed everything board related.
+
+It also need to define the `bsp.h` file because `arch.h` file include it.
+
+When compiling, you just need to specify wich cpu and board you are using, the Makefile will select the correspondant `arch.h` and `bsp.h` file.
