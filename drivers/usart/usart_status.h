@@ -1,10 +1,10 @@
 // Return values of USART functions
-#ifndef USART_TYPES_H
-#define USART_TYPES_H
+#ifndef USART_STATUS_H
+#define USART_STATUS_H
 
 typedef enum {
     USART_STATUS_OK = 0,
     USART_STATUS_ERROR = -1
-} usart_status_t;
+} UsartStatus;
 
 #endif

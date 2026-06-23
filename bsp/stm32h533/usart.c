@@ -3,7 +3,7 @@
 #include <stddef.h>
 
 #include "usart.h"
-#include "usart_types.h"
+#include "usart_status.h"
 #include "stm32h533xx.h"
 
 void usart_init(uint32_t baudrate) {
@@ -35,7 +35,7 @@ void usart_init(uint32_t baudrate) {
     USART2->CR1 |= USART_CR1_TE | USART_CR1_RE;
 }
 
-usart_status_t usart_write_char(char c) {
+UsartStatus usart_write_char(char c) {
     // Wait until TX is not full
     while ((USART2->ISR & USART_ISR_TXE_TXFNF) == 0U);
     
@@ -43,7 +43,7 @@ usart_status_t usart_write_char(char c) {
     return USART_STATUS_OK;
 }
 
-usart_status_t usart_read_char(char* ptr_c) {
+UsartStatus usart_read_char(char* ptr_c) {
     // If ptr_c is NULL
     if (ptr_c == NULL) {
         return USART_STATUS_ERROR;
@@ -56,7 +56,7 @@ usart_status_t usart_read_char(char* ptr_c) {
     return USART_STATUS_OK;
 }
 
-usart_status_t usart_write_string(const char* str) {
+UsartStatus usart_write_string(const char* str) {
     // If bad pointer
     if (str == NULL) {
         return USART_STATUS_ERROR;

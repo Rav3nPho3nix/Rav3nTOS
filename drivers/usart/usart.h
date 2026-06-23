@@ -4,19 +4,19 @@
 
 #include <stdint.h>
 
-#include "usart_types.h"
+#include "usart_status.h"
 
 // Initialisation of USART
 // Taking baudrate in parameter
 void usart_init(uint32_t baudrate);
 
 // WriteChar for USART
-usart_status_t usart_write_char(char);
+UsartStatus usart_write_char(char);
 
 // ReadChar for USART
-usart_status_t usart_read_char(char*);
+UsartStatus usart_read_char(char*);
 
 // WriteString for USART
-usart_status_t usart_write_string(const char*);
+UsartStatus usart_write_string(const char*);
 
 #endif
