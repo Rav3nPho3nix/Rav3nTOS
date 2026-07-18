@@ -1,48 +1,6 @@
 #include "task.h"
 #include <stdbool.h>
 
-// Here i set up 255 tasks (values from 0 to 254) to have the value 256 as an illegal value
-// #define NUMBER_OF_TASKS 256
-#define NUMBER_OF_TASKS 3
-#define ILLEGAL_TASK_ID NUMBER_OF_TASKS
-
-//// Typedefs and structs ////
-
-// Struct that define a task content
-typedef struct {
-    // Pointer to the task function
-    void (*function) (void *args);
-    // Priority
-    uint8_t priority;
-} TaskContent;
-//
-
-// Struct that contain a task
-// Implementing a circular doubly link list
-typedef struct TaskContainer_s TaskContainer;
-
-struct TaskContainer_s {
-    // Task content
-    TaskContent task;
-    // Pointer to next and to previous tasks containers
-    TaskContainer *next, *previous;
-};
-//
-
-// Struct that manage the tasks
-typedef struct {
-    // Array of TaskContainers
-    TaskContainer tasks[NUMBER_OF_TASKS];
-    // Array of TaskContainers pointers for each priority
-    // Will also be used for scheduling by modifying the pointer value
-    TaskContainer *priorities[NUMBER_OF_PRIORITIES];
-    // Next available TaskContainer
-    TaskContainer *available;
-} TaskManager;
-//
-
-////
-
 //// Global variables ////
 
 TaskManager task_manager;
@@ -93,7 +51,7 @@ void _task_update_next_available() {
 
 //// Functions implementations ////
 
-void task_init() {
+TaskManager* task_init() {
     // Make all tasks availables
     for (uint32_t i=0; i<NUMBER_OF_TASKS; i++) {
         _task_make_available(&task_manager.tasks[i]);
@@ -106,6 +64,8 @@ void task_init() {
     for (uint8_t i=0; i<NUMBER_OF_PRIORITIES; i++) {
         task_manager.priorities[i] = NULL;
     }
+
+    return &task_manager;
 }
 
 TaskAddStatus task_add(void (*function) (void *args), uint8_t priority, uint32_t *task_id) {
