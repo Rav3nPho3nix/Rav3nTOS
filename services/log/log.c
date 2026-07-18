@@ -1,10 +1,10 @@
 #include "log.h"
-#include "debug.h"
+#include "console.h"
 
 void _log_write(const char* category, const char* msg) {
-    debug_write(category);
-    debug_write(msg);
-    debug_write("\r\n");
+    console_write(category);
+    console_write(msg);
+    console_write("\r\n");
 }
 
 void log_info(const char* msg) {
