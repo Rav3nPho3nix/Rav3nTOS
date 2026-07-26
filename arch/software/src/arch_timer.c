@@ -1,6 +1,8 @@
 // Clock implementation using time.h and signal.h
 
 #include "arch_timer.h"
+#include "scheduler.h"
+#include "scheduler_internal.h"
 
 #include <time.h>
 #include <signal.h>
@@ -15,11 +17,19 @@ static _Atomic uint32_t tick_count = 0;
 static timer_t timer;
 static bool initialized = false;
 
+extern bool scheduler_started;
+
 // Signal handler
 void signal_handler(int signal) {
     if (signal == TIMER_SIGNAL) {
         // Increment tick counter
         atomic_fetch_add_explicit(&tick_count, 1, memory_order_relaxed);
+
+        // If scheduler is enabled AND quantum is done
+        if (scheduler_started && (tick_count % 10) == 0) {
+            // Next task from scheduler
+            scheduler_next();
+        }
     }
 }
 

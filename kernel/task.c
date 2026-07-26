@@ -1,5 +1,8 @@
-#include "task.h"
 #include <stdbool.h>
+
+#include "task.h"
+#include "task_internal.h"
+#include "context.h"
 
 //// Global variables ////
 
@@ -51,7 +54,7 @@ void _task_update_next_available() {
 
 //// Functions implementations ////
 
-TaskManager* task_init() {
+void task_init() {
     // Make all tasks availables
     for (uint32_t i=0; i<NUMBER_OF_TASKS; i++) {
         _task_make_available(&task_manager.tasks[i]);
@@ -64,11 +67,9 @@ TaskManager* task_init() {
     for (uint8_t i=0; i<NUMBER_OF_PRIORITIES; i++) {
         task_manager.priorities[i] = NULL;
     }
-
-    return &task_manager;
 }
 
-TaskAddStatus task_add(void (*function) (void *args), uint8_t priority, uint32_t *task_id) {
+TaskAddStatus task_add(void (*function) (void *args), uint8_t priority, TaskId *task_id) {
     // If the priority is illegal
     if (priority > LOWEST_PRIORITY) {
         return TASK_ADD_STATUS_ILLEGAL_PRIORITY;
@@ -118,19 +119,22 @@ TaskAddStatus task_add(void (*function) (void *args), uint8_t priority, uint32_t
     // Update next available task pointer
     _task_update_next_available();
 
+    // Initialize his context
+    context_init(&task->task);
+
     // Calculate the task id
-    *task_id = (uint32_t) (task - task_manager.tasks);
+    task_id->id = (uint32_t) (task - task_manager.tasks);
     return TASK_ADD_STATUS_OK;
 }
 
-TaskRemoveStatus task_remove(uint32_t task_id) {
+TaskRemoveStatus task_remove(TaskId task_id) {
     // If the id is illegal
-    if (task_id > LOWEST_PRIORITY) {
+    if (task_id.id > LOWEST_PRIORITY) {
         return TASK_REMOVE_STATUS_ILLEGAL_ID;
     }
 
     // Current task to remove
-    TaskContainer *current_task = &task_manager.tasks[task_id];
+    TaskContainer *current_task = &task_manager.tasks[task_id.id];
 
     // If the task is the only one of this priority
     if (current_task->next == current_task) {
@@ -158,6 +162,17 @@ TaskRemoveStatus task_remove(uint32_t task_id) {
     
     // Make the current task available
     _task_make_available(current_task);
+}
+
+// Return the pointed task for a priority
+TaskContainer* task_get_priority_cursor(uint8_t priority) {
+    // Only for internal usage so i don't check for priority value out of bounds access
+    return task_manager.priorities[priority];
+}
+
+// Set the pointed task for a priority
+void task_set_priority_cursor(uint8_t priority, TaskContainer *task) {
+    task_manager.priorities[priority] = task;
 }
 
 ////
