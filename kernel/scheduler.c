@@ -20,7 +20,7 @@ bool scheduler_started = false;
 
 //// Internal functions ////
 
-Task* _scheduler_find_next() {
+TaskContainer* _scheduler_find_next() {
     bool task_found = false;
     unsigned i = 0;
     // Store the current task to check
@@ -53,16 +53,6 @@ Task* _scheduler_find_next() {
             if (current_task) {
                 task_found = true;
                 task_set_priority_cursor(i, current_task->next);
-                
-                // Set the state of the current running task to READY
-                if (current_running_task) {
-                    current_running_task->task.state = TASK_STATE_READY;
-                }
-
-                // Set the state of the next task on running
-                current_task->task.state = TASK_STATE_RUNNING;
-                // Update new task
-                current_running_task = current_task;
             }
         }
 
@@ -74,7 +64,7 @@ Task* _scheduler_find_next() {
         return NULL;
     }
     // Return the task
-    return &current_task->task;
+    return current_task;
 }
 
 ////
@@ -89,26 +79,51 @@ void scheduler_start() {
     // Start scheduling
     scheduler_started = true;
 
-    // Task *task = _scheduler_find_next();
+    // Initialize scheduler context
+    context_scheduler_init();
 
-    // if (task) {
-        // printf("Task found : P = %u, FN = %p\n", task->priority, task->function);
-    // }
-    // else {
-        // printf("No task found\n");
-    // }
+    // Find first task
+    TaskContainer *task = _scheduler_find_next();
+
+    // If there is a task, use his context
+    if (task) {
+        current_running_task = task;
+        task->task.state = TASK_STATE_RUNNING;
+        context_set(&task->task);
+    }
 }
 
 void scheduler_next() {
-    // Find next task
-    Task *task = _scheduler_find_next();
+    // Currently running task
+    TaskContainer *running_task = current_running_task;
+    
+    // If there is a task currently running
+    if (running_task) {
+        // Change his state
+        running_task->task.state = TASK_STATE_READY;
+        
+        // Context switching to scheduler context
+        context_switch_to_scheduler(&running_task->task);
+    }
+}
 
-#include <stdio.h>
-    printf("Next\n");
 
-    // If there is a task
-    if (task) {
-        context_switch(&current_running_task->task, task);
+void scheduler_entry() {
+    // Loop indefinitely
+    while (1) {
+        // Find next task
+        TaskContainer *next_task = _scheduler_find_next();
+
+        // It there is a next task
+        if (next_task) {
+            // Change task state
+            next_task->task.state = TASK_STATE_RUNNING;
+            // Set it as the currently running one
+            current_running_task = next_task;
+
+            // Switch from scheduler to the task
+            context_switch_from_scheduler(&next_task->task);
+        }
     }
 }
 

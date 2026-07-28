@@ -22,7 +22,11 @@
 /*----------*/
 
 /*----- Function signatures -----*/
+// Find next task to execute
 void scheduler_next();
+
+// Entry point of scheduler
+void scheduler_entry();
 /*----------*/
 
 /*----- End of include guards -----*/

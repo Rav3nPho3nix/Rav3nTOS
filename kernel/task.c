@@ -69,7 +69,7 @@ void task_init() {
     }
 }
 
-TaskAddStatus task_add(void (*function) (void *args), uint8_t priority, TaskId *task_id) {
+TaskAddStatus task_add(void (*function) (), uint8_t priority, TaskId *task_id) {
     // If the priority is illegal
     if (priority > LOWEST_PRIORITY) {
         return TASK_ADD_STATUS_ILLEGAL_PRIORITY;
@@ -121,6 +121,9 @@ TaskAddStatus task_add(void (*function) (void *args), uint8_t priority, TaskId *
 
     // Initialize his context
     context_init(&task->task);
+
+    // Set his state
+    task->task.state = TASK_STATE_READY;
 
     // Calculate the task id
     task_id->id = (uint32_t) (task - task_manager.tasks);
