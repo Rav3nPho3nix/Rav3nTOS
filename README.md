@@ -1,5 +1,14 @@
 # Rav3nTOS
-My own RTOS currently supporting a STM32 NUCLEO H533RE
+My own RTOS.
+This RTOS can be run in "software" mode or on an STM32 NUCLEO H533RE.
+
+I decided to first implement all "kernel features" (like tasks, scheduling, semaphores, mutexes, IPC) in "software" mode, then implement the other essential parts (context switching) for each board.
+
+My perception of this project is simple : i will use to the "software" mode to prototype features and applications then implement it on real hardware.
+
+This RTOS is also a great way for me to understand deeply each scheduling algorithm (i will try to implement each one the cleanest way possible, it's a promise ;)).
+
+Currently, my RTOS is in a really early stage, so every modification will only be done on the "software" version. It's much simplier since i can use every C standard library (for example using `printf` for fast debugging the execution of my code). There will be later a function for the `console` service that will accept like `printf` format printing.
 
 # ToDo
 - [X] Linker
@@ -7,10 +16,18 @@ My own RTOS currently supporting a STM32 NUCLEO H533RE
 - [X] Reset Handler
 - [X] USART
 - [X] SysTick
-- [ ] Task structure
-- [ ] Context switching
-- [ ] Round robin
-- [ ] IPC & Synchronisation
+- [X] Task structure
+- [X] Context switching
+- [X] Round robin (with priorities)
+- [ ] Waiting task
+- [ ] Sleeping task
+- [ ] Merge all #define in config.h
+- [ ] Critical sections
+- [ ] Semaphores
+- [ ] Mutexes
+- [ ] Communication between tasks
+
+(Maybe)
 - [ ] Microkernel
 - [ ] MPU Isolation
 - [ ] Sandboxing
