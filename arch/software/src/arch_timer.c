@@ -4,12 +4,7 @@
 #include "scheduler.h"
 #include "scheduler_internal.h"
 
-#include <time.h>
-#include <signal.h>
-#include <string.h>
-#include <stdatomic.h>
-#include <unistd.h>
-#include <stdbool.h>
+#include "arch.h"
 
 #define TIMER_SIGNAL SIGUSR1
 

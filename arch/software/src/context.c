@@ -9,7 +9,7 @@
 #include "task_internal.h"
 #include "scheduler_internal.h"
 
-#include <ucontext.h>
+#include "arch.h"
 /*----------*/
 
 /*----- Defines -----*/
