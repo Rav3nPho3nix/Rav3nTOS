@@ -1,26 +1,41 @@
 #include "log.h"
-#include "console.h"
+#include "printf.h"
 
-void _log_write(const char* category, const char* msg) {
-    console_write(category);
-    console_write(msg);
-    console_write("\r\n");
+void log_info(const char* format, ...) {
+    printf_("[INFO] ");
+    va_list args;
+    va_start(args, format);
+    vprintf_(format, args);
+    va_end(args);
+    printf_("\n");
 }
 
-void log_info(const char* msg) {
-    _log_write("[INFO] ", msg);
+void log_error(const char* format, ...) {
+    printf_("[ERROR] ");
+    va_list args;
+    va_start(args, format);
+    vprintf_(format, args);
+    va_end(args);
+    printf_("\n");
 }
 
-void log_error(const char* msg) {
-    _log_write("[ERROR] ", msg);
+void log_warn(const char* format, ...) {
+    printf_("[WARN] ");
+    va_list args;
+    va_start(args, format);
+    vprintf_(format, args);
+    va_end(args);
+    printf_("\n");
 }
 
-void log_warn(const char* msg) {
-    _log_write("[WARN] ", msg);
-}
+void log_panic(const char* format, ...) {
+    printf_("[PANIC] ");
+    va_list args;
+    va_start(args, format);
+    vprintf_(format, args);
+    va_end(args);
+    printf_("\n");
 
-void log_panic(const char* msg) {
-    _log_write("[PANIC] ", msg);
     // Never quit panic function
-    while (1) {}
+    while (1);
 }
