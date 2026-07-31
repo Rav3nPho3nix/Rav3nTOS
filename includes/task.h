@@ -18,8 +18,7 @@ Priorities :
 /*
 Here i set up 255 tasks (values from 0 to 254) to have the value 256 as an illegal value
 */
-// #define NUMBER_OF_TASKS 256
-#define NUMBER_OF_TASKS 3
+#define NUMBER_OF_TASKS 256
 #define ILLEGAL_TASK_ID NUMBER_OF_TASKS
 
 //// Typedefs and structs ////
@@ -28,6 +27,9 @@ Here i set up 255 tasks (values from 0 to 254) to have the value 256 as an illeg
 typedef struct {
     uint32_t id;
 } TaskId;
+
+// Typedef that define the function of the task
+typedef void (*TaskFunction) (void *args);
 
 // Enum that defines task state
 typedef enum {
@@ -68,7 +70,7 @@ void task_init();
 // Take function pointer, priority
 // Modify 'task_id' argument
 // Return status value
-TaskAddStatus task_add(void (*function) (void *args), uint8_t priority, TaskId *task_id);
+TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, TaskId *task_id);
 
 // Remove a task by taking is id
 TaskRemoveStatus task_remove(TaskId task_id);

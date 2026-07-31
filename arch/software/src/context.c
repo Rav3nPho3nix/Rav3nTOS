@@ -24,7 +24,12 @@ uint8_t scheduler_stack[STACK_SIZE];
 /*----------*/
 
 /*----- Internal functions -----*/
-
+void _context_task_entry() {
+    Task *task = scheduler_get_current_task();
+    if (task) {
+        task->function(task->args);
+    }
+}
 /*----------*/
 
 /*----- Function implementations -----*/
@@ -36,7 +41,7 @@ void context_init(Task *task) {
     task->context.uc_stack.ss_size = STACK_SIZE;
     task->context.uc_link = &scheduler_context;
 
-    makecontext(&task->context, task->function, 0);
+    makecontext(&task->context, _context_task_entry, 0);
 }
 
 // Initialize context for scheduler

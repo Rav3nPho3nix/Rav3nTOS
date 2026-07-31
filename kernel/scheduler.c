@@ -93,7 +93,7 @@ void _scheduler_idle_task() {
 // Initialize scheduler with an idle task that does nothing
 void scheduler_init() {
     // Add the idle task
-    task_add(&_scheduler_idle_task, LOWEST_PRIORITY, NULL);
+    task_add(&_scheduler_idle_task, NULL, LOWEST_PRIORITY, NULL);
 }
 
 void scheduler_start() {
@@ -146,6 +146,10 @@ void scheduler_entry() {
             context_switch_from_scheduler(&next_task->task);
         }
     }
+}
+
+Task* scheduler_get_current_task() {
+    return &current_running_task->task;
 }
 
 ////

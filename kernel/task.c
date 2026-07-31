@@ -70,7 +70,7 @@ void task_init() {
     }
 }
 
-TaskAddStatus task_add(void (*function) (), uint8_t priority, TaskId *task_id) {
+TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, TaskId *task_id) {
     // If the priority is illegal
     if (priority > LOWEST_PRIORITY) {
         return TASK_ADD_STATUS_ILLEGAL_PRIORITY;
@@ -125,6 +125,9 @@ TaskAddStatus task_add(void (*function) (), uint8_t priority, TaskId *task_id) {
 
     // Set his state
     task->task.state = TASK_STATE_READY;
+
+    // Set his arguments
+    task->task.args = args;
 
     // If a TaskId pointer was given (for example, the idle task does not give this pointer)
     if (task_id) {

@@ -10,7 +10,7 @@
 /*----------*/
 
 /*----- Includes -----*/
-
+#include "task_internal.h"
 /*----------*/
 
 /*----- Defines -----*/
@@ -27,6 +27,9 @@ void scheduler_next();
 
 // Entry point of scheduler
 void scheduler_entry();
+
+// Getter for the current task
+Task* scheduler_get_current_task();
 /*----------*/
 
 /*----- End of include guards -----*/

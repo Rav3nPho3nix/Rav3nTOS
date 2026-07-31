@@ -7,7 +7,9 @@
 // Struct that define a task
 typedef struct {
     // Pointer to the task function
-    void (*function) ();
+    TaskFunction function;
+    // Task arguments
+    void *args;
     // Priority
     uint8_t priority;
     // Context
