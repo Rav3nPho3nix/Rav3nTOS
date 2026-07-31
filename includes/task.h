@@ -33,8 +33,9 @@ typedef struct {
 typedef enum {
     TASK_STATE_READY = 0,
     TASK_STATE_RUNNING = 1,
-    TASK_STATE_WAITING = 2,
-    TASK_STATE_UNUSED = 3,
+    TASK_STATE_SLEEPING = 2,
+    TASK_STATE_PAUSED = 3,
+    TASK_STATE_UNUSED = 4,
 } TaskState;
 
 // Enum for status values when adding a task
@@ -49,6 +50,12 @@ typedef enum {
     TASK_REMOVE_STATUS_OK = 0,
     TASK_REMOVE_STATUS_ILLEGAL_ID = 1,
 } TaskRemoveStatus;
+
+// Enum for status values when putting to sleep a task
+typedef enum {
+    TASK_SLEEP_STATUS_OK = 0,
+    TASK_SLEEP_STATUS_ILLEGAL_ID = 1,
+} TaskSleepStatus;
 
 ////
 
@@ -65,5 +72,8 @@ TaskAddStatus task_add(void (*function) (void *args), uint8_t priority, TaskId *
 
 // Remove a task by taking is id
 TaskRemoveStatus task_remove(TaskId task_id);
+
+// Put a task to sleep for n ticks
+TaskSleepStatus task_sleep(TaskId task_id, uint32_t n);
 
 #endif

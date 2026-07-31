@@ -3,6 +3,7 @@
 #include "task.h"
 #include "task_internal.h"
 #include "context.h"
+#include "clock.h"
 
 //// Global variables ////
 
@@ -125,8 +126,12 @@ TaskAddStatus task_add(void (*function) (), uint8_t priority, TaskId *task_id) {
     // Set his state
     task->task.state = TASK_STATE_READY;
 
-    // Calculate the task id
-    task_id->id = (uint32_t) (task - task_manager.tasks);
+    // If a TaskId pointer was given (for example, the idle task does not give this pointer)
+    if (task_id) {
+        // Calculate the task id
+        task_id->id = (uint32_t) (task - task_manager.tasks);
+    }
+    
     return TASK_ADD_STATUS_OK;
 }
 
@@ -176,6 +181,24 @@ TaskContainer* task_get_priority_cursor(uint8_t priority) {
 // Set the pointed task for a priority
 void task_set_priority_cursor(uint8_t priority, TaskContainer *task) {
     task_manager.priorities[priority] = task;
+}
+
+// Put a task to sleep for n ticks
+TaskSleepStatus task_sleep(TaskId task_id, uint32_t n) {
+    // If the id is illegal
+    if (task_id.id >= NUMBER_OF_TASKS) {
+        return TASK_SLEEP_STATUS_ILLEGAL_ID;
+    }
+
+    // Current task to put at sleep
+    TaskContainer *task = &task_manager.tasks[task_id.id];
+
+    // Set his new state
+    task->task.state = TASK_STATE_SLEEPING;
+    // Set his wake up tick value
+    task->task.wake_up_tick = clock_get_tick() + n;
+
+    return TASK_SLEEP_STATUS_OK;
 }
 
 ////

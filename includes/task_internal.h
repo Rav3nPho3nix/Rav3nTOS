@@ -16,6 +16,8 @@ typedef struct {
     uint8_t stack[STACK_SIZE];
     // State
     TaskState state;
+    // Tick value to wake up after a call to 'task_sleep'
+    uint32_t wake_up_tick;
 } Task;
 //
 

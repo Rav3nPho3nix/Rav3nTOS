@@ -3,6 +3,7 @@
 #include "task.h"
 #include "task_internal.h"
 #include "context.h"
+#include "clock.h"
 
 //// Typedef ////
 
@@ -38,14 +39,24 @@ TaskContainer* _scheduler_find_next() {
 
             // Loop while current_task is not null (if so, there is no task) and if the task is not READY
             while (current_task && current_task->task.state != TASK_STATE_READY) {
-                // If the next task is the first task, there is no READY task for this priority 
-                if (current_task->next == first_task) {
-                    // Set to NULL to exit while loop
-                    current_task = NULL;
+                // If the current_task is SLEEPING and if his wake up tick number is passed, make it READY without looping to the next one
+                if (current_task->task.state == TASK_STATE_SLEEPING &&
+                    clock_get_tick() >= current_task->task.wake_up_tick) {
+                        // Set it as READY
+                        current_task->task.state = TASK_STATE_READY;
                 }
-                // Else we loop to the next one
+
+                // Else the current_task is neither READY or SLEEPING
                 else {
-                    current_task = current_task->next;
+                    // If the next task is the first task, there is no READY task for this priority 
+                    if (current_task->next == first_task) {
+                        // Set to NULL to exit while loop
+                        current_task = NULL;
+                    }
+                    // Else we loop to the next one
+                    else {
+                        current_task = current_task->next;
+                    }
                 }
             }
             
@@ -58,7 +69,7 @@ TaskContainer* _scheduler_find_next() {
 
         i++;
     }
-    
+
     // If there is no task
     if (!current_task) {
         return NULL;
@@ -67,12 +78,22 @@ TaskContainer* _scheduler_find_next() {
     return current_task;
 }
 
+// Idle task function
+void _scheduler_idle_task() {
+    // Does nothing
+    while (1) {
+        scheduler_next();
+    }
+}
+
 ////
 
 //// Functions implementations ////
 
+// Initialize scheduler with an idle task that does nothing
 void scheduler_init() {
-    // 
+    // Add the idle task
+    task_add(&_scheduler_idle_task, LOWEST_PRIORITY, NULL);
 }
 
 void scheduler_start() {
