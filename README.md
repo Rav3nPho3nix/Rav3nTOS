@@ -19,8 +19,9 @@ Currently, my RTOS is in a really early stage, so every modification will only b
 - [X] Task structure
 - [X] Context switching
 - [X] Round robin (with priorities)
+- [ ] Struct for task arguments
 - [ ] Waiting task
-- [ ] Sleeping task
+- [X] Sleeping task
 - [ ] Merge all #define in config.h
 - [ ] Critical sections
 - [ ] Semaphores
