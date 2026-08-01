@@ -189,20 +189,16 @@ void task_set_priority_cursor(uint8_t priority, TaskContainer *task) {
     task_manager.priorities[priority] = task;
 }
 
-// Put a task to sleep for n ticks
-TaskSleepStatus task_sleep(TaskId task_id, uint32_t n) {
-    // If the id is illegal
-    if (task_id.id >= NUMBER_OF_TASKS) {
-        return TASK_SLEEP_STATUS_ILLEGAL_ID;
-    }
-
+// Put the current task to sleep for n ticks
+TaskSleepStatus task_sleep(uint32_t n) {
     // Current task to put at sleep
-    TaskContainer *task = &task_manager.tasks[task_id.id];
+    // TaskContainer *task = &task_manager.tasks[task_id.id];
+    Task *task = scheduler_get_current_task();
 
     // Set his new state
-    task->task.state = TASK_STATE_SLEEPING;
+    task->state = TASK_STATE_SLEEPING;
     // Set his wake up tick value
-    task->task.wake_up_tick = clock_get_tick() + n;
+    task->wake_up_tick = clock_get_tick() + n;
 
     // Give the hand to the scheduler
     scheduler_next();

@@ -86,7 +86,7 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
 // Remove a task by taking is id
 TaskRemoveStatus task_remove(TaskId task_id);
 
-// Put a task to sleep for n ticks
-TaskSleepStatus task_sleep(TaskId task_id, uint32_t n);
+// Put the current task to sleep for n ticks
+TaskSleepStatus task_sleep(uint32_t n);
 
 #endif
