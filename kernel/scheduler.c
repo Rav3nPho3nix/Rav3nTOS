@@ -115,16 +115,16 @@ void scheduler_start() {
 }
 
 void scheduler_next() {
-    // Currently running task
-    TaskContainer *running_task = current_running_task;
-    
     // If there is a task currently running
-    if (running_task) {
-        // Change his state
-        running_task->task.state = TASK_STATE_READY;
+    if (current_running_task) {
+        // If the task is in RUNNING, set is as READY
+        if (current_running_task->task.state == TASK_STATE_RUNNING) {
+            // Change his state
+            current_running_task->task.state = TASK_STATE_READY;
+        }
         
         // Context switching to scheduler context
-        context_switch_to_scheduler(&running_task->task);
+        context_switch_to_scheduler(&current_running_task->task);
     }
 }
 
