@@ -11,53 +11,61 @@ else
 # Build
 TARGET = rav3ntos
 BUILD_DIR = build
-ELF = $(TARGET).elf
 
 ###### TO CHANGE DEPENDING ON TARGET PLATFORM ######
+# Output file extension
+EXTENSION = out
+# Output file
+OUTPUT = $(TARGET).$(EXTENSION)
+
 # Architecture directory
-ARCH_DIR = arch/arm/cortex-m33
+ARCH_DIR = arch/software
+ARCH_INCLUDE_DIR = $(ARCH_DIR)/include
+ARCH_SRC_DIR = $(ARCH_DIR)/src
 
 # Board support package directory
-BSP_DIR = bsp/stm32h533
+BSP_DIR = bsp/software
+BSP_INCLUDE_DIR = $(BSP_DIR)/include
+BSP_SRC_DIR = $(BSP_DIR)/src
 
-# Cross compiler
-CC = arm-none-eabi-gcc
+# Compiler
+CC = gcc
 
 # Linker
-LD = arm-none-eabi-gcc
+LD = gcc
 
 # Added flags depending on target architecture
-ADD_CFLAGS = -mcpu=cortex-m33 -mthumb
+# ADD_CFLAGS = -g -ffreestanding -nostdlib -mcpu=cortex-m33 -mthumb
+# ADD_LDFLAGS = -nostdlib -T $(BSP_SRC_DIR)/linker.ld
+ADD_CFLAGS =
+ADD_LDFLAGS = 
+
+# Default flags
+CFLAGS = -O0 $(ADD_CFLAGS) $(INCLUDES)
+LDFLAGS = $(ADD_LDFLAGS)
 ######
 
 # Sources files
 SRCS = \
 	kernel/main.c \
 	kernel/clock.c \
-\
-	$(ARCH_DIR)/startup.s \
-	$(ARCH_DIR)/systick.c \
-	$(ARCH_DIR)/arch_timer.c \
-\
-	$(BSP_DIR)/platform.c \
-	$(BSP_DIR)/usart.c \
-\
-	services/debug/debug.c \
+	kernel/task.c \
+	kernel/scheduler.c \
+	kernel/printf.c \
+	\
+	$(ARCH_SRC_DIR)/arch_timer.c \
+	$(ARCH_SRC_DIR)/context.c \
+	\
+	$(BSP_SRC_DIR)/putchar.c \
+	\
 	services/log/log.c
 
 # Includes
 INCLUDES = \
 	-Iincludes \
-	-Iincludes/cmsis/core \
-	-Iincludes/cmsis/device \
-	-I$(BSP_DIR) \
-	-I$(ARCH_DIR) \
-	-Idrivers/usart \
+	-I$(BSP_INCLUDE_DIR) \
+	-I$(ARCH_INCLUDE_DIR) \
 	-Ikernel
-
-# Defaults flags
-CFLAGS = -O0 -g -ffreestanding -nostdlib $(ADD_CFLAGS) $(INCLUDES)
-LDFLAGS = -nostdlib -T $(BSP_DIR)/linker.ld
 
 # Default target
 .DEFAULT_GOAL := compilation
@@ -67,7 +75,7 @@ OBJS = $(SRCS:%.c=$(BUILD_DIR)/%.o)
 OBJS := $(OBJS:%.s=$(BUILD_DIR)/%.o)
 
 # Compilation
-compilation: $(BUILD_DIR)/$(ELF)
+compilation: $(BUILD_DIR)/$(OUTPUT)
 	@echo "> Build OK"
 
 $(BUILD_DIR)/%.o: %.c
@@ -78,7 +86,7 @@ $(BUILD_DIR)/%.o: %.s
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/$(ELF): $(OBJS)
+$(BUILD_DIR)/$(OUTPUT): $(OBJS)
 	$(LD) $(OBJS) $(LDFLAGS) -o $@
 	@echo "> Link OK"
 
