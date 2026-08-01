@@ -9,7 +9,7 @@ typedef struct {
     // Pointer to the task function
     TaskFunction function;
     // Task arguments
-    void *args;
+    TaskArgs args;
     // Priority
     uint8_t priority;
     // Context
@@ -36,7 +36,7 @@ struct TaskContainer_s {
 //
 
 // Struct that manage the tasks
-typedef struct TaskManager_s {
+typedef struct {
     // Array of TaskContainers
     TaskContainer tasks[NUMBER_OF_TASKS];
     // Array of TaskContainers pointers for each priority

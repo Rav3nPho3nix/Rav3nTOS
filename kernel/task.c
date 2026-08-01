@@ -4,6 +4,7 @@
 #include "task_internal.h"
 #include "context.h"
 #include "clock.h"
+#include "scheduler_internal.h"
 
 //// Global variables ////
 
@@ -120,19 +121,21 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
     // Update next available task pointer
     _task_update_next_available();
 
+    // Fill his self id in his arguments
+    task->task.args.self_id.id = (uint32_t) (task - task_manager.tasks);
+    // Fill the optional arguments in his arguments
+    task->task.args.optional_args = args;
+
     // Initialize his context
     context_init(&task->task);
 
     // Set his state
     task->task.state = TASK_STATE_READY;
 
-    // Set his arguments
-    task->task.args = args;
-
     // If a TaskId pointer was given (for example, the idle task does not give this pointer)
     if (task_id) {
-        // Calculate the task id
-        task_id->id = (uint32_t) (task - task_manager.tasks);
+        // Change the pointed value as his own id
+        task_id->id = task->task.args.self_id.id;
     }
     
     return TASK_ADD_STATUS_OK;
@@ -200,6 +203,9 @@ TaskSleepStatus task_sleep(TaskId task_id, uint32_t n) {
     task->task.state = TASK_STATE_SLEEPING;
     // Set his wake up tick value
     task->task.wake_up_tick = clock_get_tick() + n;
+
+    // Give the hand to the scheduler
+    scheduler_next();
 
     return TASK_SLEEP_STATUS_OK;
 }

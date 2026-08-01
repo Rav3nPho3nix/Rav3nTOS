@@ -28,8 +28,19 @@ typedef struct {
     uint32_t id;
 } TaskId;
 
+// Typedef that define the function parameters
+// Containing at minimal the id of the task itself and others optional arguments
+typedef struct {
+    // Id of the task itself
+    TaskId self_id;
+    // Optional arguments
+    void *optional_args;
+} TaskArgs;
+
 // Typedef that define the function of the task
-typedef void (*TaskFunction) (void *args);
+// TaskArgs is passed by value (not by pointer) so the task cannot change the self_id or the optional_args pointer stored internally.
+// Note: this does NOT protect the data pointed to by optional_args itself.
+typedef void (*TaskFunction) (TaskArgs args);
 
 // Enum that defines task state
 typedef enum {
