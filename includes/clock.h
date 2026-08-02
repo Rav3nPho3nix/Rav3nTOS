@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 // Initialize clock
-uint32_t clock_init(uint32_t ticks);
+void clock_init(uint32_t ticks);
 
 // Get current tick value
 uint32_t clock_get_tick();

@@ -5,6 +5,7 @@
 #include "context.h"
 #include "clock.h"
 #include "scheduler_internal.h"
+#include "critical.h"
 
 //// Global variables ////
 
@@ -77,6 +78,8 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
         return TASK_ADD_STATUS_ILLEGAL_PRIORITY;
     }
 
+    critical_enter();
+
     // If there is no next available task
     if (!task_manager.available) {
         // return error value
@@ -126,9 +129,6 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
     // Fill the optional arguments in his arguments
     task->task.args.optional_args = args;
 
-    // Initialize his context
-    context_init(&task->task);
-
     // Set his state
     task->task.state = TASK_STATE_READY;
 
@@ -137,7 +137,12 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
         // Change the pointed value as his own id
         task_id->id = task->task.args.self_id.id;
     }
-    
+
+    critical_exit();
+
+    // Initialize his context
+    context_init(&task->task);
+
     return TASK_ADD_STATUS_OK;
 }
 
@@ -146,6 +151,8 @@ TaskRemoveStatus task_remove(TaskId task_id) {
     if (task_id.id > LOWEST_PRIORITY) {
         return TASK_REMOVE_STATUS_ILLEGAL_ID;
     }
+
+    critical_enter();
 
     // Current task to remove
     TaskContainer *current_task = &task_manager.tasks[task_id.id];
@@ -176,6 +183,10 @@ TaskRemoveStatus task_remove(TaskId task_id) {
     
     // Make the current task available
     _task_make_available(current_task);
+
+    critical_exit();
+
+    return TASK_REMOVE_STATUS_OK;
 }
 
 // Return the pointed task for a priority
@@ -195,10 +206,14 @@ TaskSleepStatus task_sleep(uint32_t n) {
     // TaskContainer *task = &task_manager.tasks[task_id.id];
     Task *task = scheduler_get_current_task();
 
+    critical_enter();
+
     // Set his new state
     task->state = TASK_STATE_SLEEPING;
     // Set his wake up tick value
     task->wake_up_tick = clock_get_tick() + n;
+
+    critical_exit();
 
     // Give the hand to the scheduler
     scheduler_next();

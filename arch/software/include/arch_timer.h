@@ -4,8 +4,10 @@
 #include <stdint.h>
 #include "arch.h"
 
+#define TIMER_SIGNAL SIGUSR1
+
 // Initialize timer
-uint32_t arch_timer_init(uint32_t ticks);
+void arch_timer_init(uint32_t ticks);
 
 // Get current tick
 uint32_t arch_timer_get_tick();

@@ -6,8 +6,6 @@
 
 #include "arch.h"
 
-#define TIMER_SIGNAL SIGUSR1
-
 static _Atomic uint32_t tick_count = 0;
 static timer_t timer;
 static bool initialized = false;
@@ -21,7 +19,7 @@ void signal_handler(int signal) {
         atomic_fetch_add_explicit(&tick_count, 1, memory_order_relaxed);
 
         // If scheduler is enabled AND quantum is done
-        if (scheduler_started && (tick_count % 10) == 0) {
+        if (scheduler_started && (tick_count % 100) == 0) {
             // Next task from scheduler
             scheduler_next();
         }
@@ -29,10 +27,10 @@ void signal_handler(int signal) {
 }
 
 // Initialize timer
-uint32_t arch_timer_init(uint32_t ticks) {
+void arch_timer_init(uint32_t ticks) {
     // If the clock is already initialized
     if (initialized) {
-        return 1;
+        return;
     }
 
     // Initialisation of signal handler
@@ -43,7 +41,7 @@ uint32_t arch_timer_init(uint32_t ticks) {
     action.sa_flags = 0;
 
     if (sigaction(TIMER_SIGNAL, &action, NULL) == -1) {
-        return 1;
+        return;
     }
 
     struct sigevent event;
@@ -54,7 +52,7 @@ uint32_t arch_timer_init(uint32_t ticks) {
 
     // Create the timer
     if (timer_create(CLOCK_MONOTONIC, &event, &timer) == -1) {
-        return 1;
+        return;
     }
 
     // Set the time
@@ -65,13 +63,11 @@ uint32_t arch_timer_init(uint32_t ticks) {
 
     // Start the timer
     if (timer_settime(timer, 0, &timer_spec, NULL) == -1) {
-        return 1;
+        return;
     }
 
     atomic_store_explicit(&tick_count, 0, memory_order_relaxed);
     initialized = true;
-
-    return 0;
 }
 
 // Get current tick

@@ -4,6 +4,7 @@
 #include "task_internal.h"
 #include "context.h"
 #include "clock.h"
+#include "critical.h"
 
 //// Typedef ////
 
@@ -42,8 +43,8 @@ TaskContainer* _scheduler_find_next() {
                 // If the current_task is SLEEPING and if his wake up tick number is passed, make it READY without looping to the next one
                 if (current_task->task.state == TASK_STATE_SLEEPING &&
                     clock_get_tick() >= current_task->task.wake_up_tick) {
-                        // Set it as READY
-                        current_task->task.state = TASK_STATE_READY;
+                    // Set it as READY
+                    current_task->task.state = TASK_STATE_READY;
                 }
 
                 // Else the current_task is neither READY or SLEEPING
@@ -109,7 +110,11 @@ void scheduler_start() {
     // If there is a task, use his context
     if (task) {
         current_running_task = task;
+
+        critical_enter();
         task->task.state = TASK_STATE_RUNNING;
+        critical_exit();
+
         context_set(&task->task);
     }
 }
@@ -117,11 +122,16 @@ void scheduler_start() {
 void scheduler_next() {
     // If there is a task currently running
     if (current_running_task) {
+
+        critical_enter();
+
         // If the task is in RUNNING, set is as READY
         if (current_running_task->task.state == TASK_STATE_RUNNING) {
             // Change his state
             current_running_task->task.state = TASK_STATE_READY;
         }
+
+        critical_exit();
         
         // Context switching to scheduler context
         context_switch_to_scheduler(&current_running_task->task);
@@ -132,6 +142,9 @@ void scheduler_next() {
 void scheduler_entry() {
     // Loop indefinitely
     while (1) {
+
+        critical_enter();
+
         // Find next task
         TaskContainer *next_task = _scheduler_find_next();
 
@@ -144,6 +157,10 @@ void scheduler_entry() {
 
             // Switch from scheduler to the task
             context_switch_from_scheduler(&next_task->task);
+        }
+        // Else exit critical
+        else {
+            critical_exit();
         }
     }
 }

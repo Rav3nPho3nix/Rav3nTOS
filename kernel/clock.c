@@ -1,8 +1,8 @@
 #include "clock.h"
 #include "arch_timer.h"
 
-uint32_t clock_init(uint32_t ticks) {
-    return arch_timer_init(ticks);
+void clock_init(uint32_t ticks) {
+    arch_timer_init(ticks);
 }
 
 uint32_t clock_get_tick() {
