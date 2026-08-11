@@ -103,4 +103,7 @@ TaskPauseStatus task_pause(TaskId task_id);
 // Unpause the task by taking is id
 TaskUnpauseStatus task_unpause(TaskId task_id);
 
+// Give up the current task to the scheduler
+void task_yield();
+
 #endif

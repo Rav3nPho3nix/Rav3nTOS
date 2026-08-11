@@ -288,4 +288,9 @@ TaskUnpauseStatus task_unpause(TaskId task_id) {
     return TASK_UNPAUSE_STATUS_OK;
 }
 
+// Give up the current task to the scheduler
+void task_yield() {
+    scheduler_next();
+}
+
 ////
