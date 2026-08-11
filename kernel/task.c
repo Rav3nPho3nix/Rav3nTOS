@@ -152,10 +152,13 @@ TaskRemoveStatus task_remove(TaskId task_id) {
         return TASK_REMOVE_STATUS_ILLEGAL_ID;
     }
 
-    critical_enter();
-
     // Current task to remove
     TaskContainer *current_task = &task_manager.tasks[task_id.id];
+
+    critical_enter();
+
+    // If the task is removing itself
+    bool remove_itself = &current_task->task == scheduler_get_current_task();
 
     // If the task is the only one of this priority
     if (current_task->next == current_task) {
@@ -186,6 +189,14 @@ TaskRemoveStatus task_remove(TaskId task_id) {
 
     critical_exit();
 
+    // If remove itself, pass to the scheduler
+    if (remove_itself) {
+        scheduler_next();
+
+        // Never reach here
+        while (1);
+    }
+
     return TASK_REMOVE_STATUS_OK;
 }
 
@@ -201,7 +212,7 @@ void task_set_priority_cursor(uint8_t priority, TaskContainer *task) {
 }
 
 // Put the current task to sleep for n ticks
-TaskSleepStatus task_sleep(uint32_t n) {
+void task_sleep(uint32_t n) {
     // Current task to put at sleep
     // TaskContainer *task = &task_manager.tasks[task_id.id];
     Task *task = scheduler_get_current_task();
@@ -217,8 +228,64 @@ TaskSleepStatus task_sleep(uint32_t n) {
 
     // Give the hand to the scheduler
     scheduler_next();
+}
 
-    return TASK_SLEEP_STATUS_OK;
+// Pause the task by taking is id
+TaskPauseStatus task_pause(TaskId task_id) {
+    // If the id is illegal
+    if (task_id.id > LOWEST_PRIORITY) {
+        return TASK_PAUSE_STATUS_ILLEGAL_ID;
+    }
+
+    // Current task to pause
+    TaskContainer *task = &task_manager.tasks[task_id.id];
+
+    // If the task is already paused
+    if (task->task.state == TASK_STATE_PAUSED) {
+        return TASK_PAUSE_STATUS_ALREADY_PAUSED;
+    }
+
+    // If the task is pausing itself
+    bool pause_itself = &task->task == scheduler_get_current_task();
+
+    critical_enter();
+
+    // Pause the task
+    task->task.state = TASK_STATE_PAUSED;
+
+    critical_exit();
+
+    // If pauses itself, pass to the scheduler
+    if (pause_itself) {
+        scheduler_next();
+    }
+
+    return TASK_PAUSE_STATUS_OK;
+}
+
+// Unpause the task by taking is id
+TaskUnpauseStatus task_unpause(TaskId task_id) {
+    // If the id is illegal
+    if (task_id.id > LOWEST_PRIORITY) {
+        return TASK_UNPAUSE_STATUS_ILLEGAL_ID;
+    }
+
+    // Current task to unpause
+    TaskContainer *task = &task_manager.tasks[task_id.id];
+
+    // If the task is not paused
+    if (task->task.state != TASK_STATE_PAUSED) {
+        return TASK_UNPAUSE_STATUS_NOT_PAUSED;
+    }
+
+    critical_enter();
+
+    // Unpause the task
+    task->task.state = TASK_STATE_READY;
+
+    critical_exit();
+
+    return TASK_UNPAUSE_STATUS_OK;
 }
 
 ////

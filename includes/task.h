@@ -64,11 +64,19 @@ typedef enum {
     TASK_REMOVE_STATUS_ILLEGAL_ID = 1,
 } TaskRemoveStatus;
 
-// Enum for status values when putting to sleep a task
+// Enum for status values when pausing a task
 typedef enum {
-    TASK_SLEEP_STATUS_OK = 0,
-    TASK_SLEEP_STATUS_ILLEGAL_ID = 1,
-} TaskSleepStatus;
+    TASK_PAUSE_STATUS_OK = 0,
+    TASK_PAUSE_STATUS_ILLEGAL_ID = 1,
+    TASK_PAUSE_STATUS_ALREADY_PAUSED = 2,
+} TaskPauseStatus;
+
+// Enum for status values when unpausing a task
+typedef enum {
+    TASK_UNPAUSE_STATUS_OK = 0,
+    TASK_UNPAUSE_STATUS_ILLEGAL_ID = 1,
+    TASK_UNPAUSE_STATUS_NOT_PAUSED = 2,
+} TaskUnpauseStatus;
 
 ////
 
@@ -87,6 +95,12 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
 TaskRemoveStatus task_remove(TaskId task_id);
 
 // Put the current task to sleep for n ticks
-TaskSleepStatus task_sleep(uint32_t n);
+void task_sleep(uint32_t n);
+
+// Pause the task by taking is id
+TaskPauseStatus task_pause(TaskId task_id);
+
+// Unpause the task by taking is id
+TaskUnpauseStatus task_unpause(TaskId task_id);
 
 #endif
