@@ -3,22 +3,18 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "config.h"
 
 /*
-Define tasks using priorities.
 Priorities :
-0 to 30 : 0 = highest & 30 = lowest
-31 : illegal value for available task
+0 to (NUMBER_OF_PRIORITIES -1) : 0 = highest
+NUMBER_OF_PRIORITIES : illegal value for available task
 */
-#define NUMBER_OF_PRIORITIES 31
 #define HIGHEST_PRIORITY 0
 #define LOWEST_PRIORITY (NUMBER_OF_PRIORITIES - 1)
 #define ILLEGAL_PRIORITY NUMBER_OF_PRIORITIES
 
-/*
-Here i set up 255 tasks (values from 0 to 254) to have the value 256 as an illegal value
-*/
-#define NUMBER_OF_TASKS 256
+// Illegal task id is just the nubmer of tasks because it goes from 0 to (NUMBER_OF_TASKS -1)
 #define ILLEGAL_TASK_ID NUMBER_OF_TASKS
 
 //// Typedefs and structs ////

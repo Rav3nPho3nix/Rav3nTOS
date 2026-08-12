@@ -5,6 +5,7 @@
 #include "scheduler_internal.h"
 #include "critical.h"
 #include "task.h"
+#include "config.h"
 
 #include "arch.h"
 
@@ -26,7 +27,7 @@ void signal_handler(int signal) {
     atomic_fetch_add_explicit(&tick_count, 1, memory_order_relaxed);
 
     // If scheduler is enabled AND quantum is done
-    if (scheduler_started && (tick_count % 100) == 0) {
+    if (scheduler_started && (tick_count % QUANTUM_VALUE) == 0) {
         // Set the preemption boolean
         preemption_pending = 1;
     }
