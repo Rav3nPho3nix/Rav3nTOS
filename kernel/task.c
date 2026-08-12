@@ -8,6 +8,12 @@
 #include "scheduler_internal.h"
 #include "critical.h"
 
+// Illegal task priority is just the number of priorities
+#define ILLEGAL_PRIORITY NUMBER_OF_PRIORITIES
+
+// Illegal task id is just the nubmer of tasks because it goes from 0 to (NUMBER_OF_TASKS -1)
+#define ILLEGAL_TASK_ID NUMBER_OF_TASKS
+
 //// Global variables ////
 
 TaskManager task_manager;
