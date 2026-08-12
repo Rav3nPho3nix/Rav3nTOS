@@ -301,7 +301,7 @@ void task_yield() {
 }
 
 // Check the preemption flag and yield if the quantum is done
-void task_check_preemption(void) {
+void task_check_preemption() {
     if (clock_consume_preemption_flag()) {
         scheduler_next();
     }
