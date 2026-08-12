@@ -3,6 +3,8 @@
 #include "arch_timer.h"
 #include "scheduler.h"
 #include "scheduler_internal.h"
+#include "critical.h"
+#include "task.h"
 
 #include "arch.h"
 
@@ -10,19 +12,23 @@ static _Atomic uint32_t tick_count = 0;
 static timer_t timer;
 static bool initialized = false;
 
+static volatile sig_atomic_t preemption_pending = 0;
+
 extern bool scheduler_started;
 
 // Signal handler
 void signal_handler(int signal) {
-    if (signal == TIMER_SIGNAL) {
-        // Increment tick counter
-        atomic_fetch_add_explicit(&tick_count, 1, memory_order_relaxed);
+    if (signal != TIMER_SIGNAL) {
+        return;
+    }
 
-        // If scheduler is enabled AND quantum is done
-        if (scheduler_started && (tick_count % 100) == 0) {
-            // Next task from scheduler
-            scheduler_next();
-        }
+    // Increment tick counter
+    atomic_fetch_add_explicit(&tick_count, 1, memory_order_relaxed);
+
+    // If scheduler is enabled AND quantum is done
+    if (scheduler_started && (tick_count % 100) == 0) {
+        // Set the preemption boolean
+        preemption_pending = 1;
     }
 }
 
@@ -79,7 +85,16 @@ uint32_t arch_timer_get_tick() {
 void arch_timer_delay(uint32_t n) {
     uint32_t start = arch_timer_get_tick();
     while (arch_timer_get_tick() - start < n) {
-        // Pausing CPU
-        pause();
+        // Check if the quantum is passed to pass to the scheduler
+        task_check_preemption();
     }
+}
+
+// Consume the preemption flag
+bool arch_timer_consume_preemption_flag() {
+    if (preemption_pending) {
+        preemption_pending = 0;
+        return true;
+    }
+    return false;
 }

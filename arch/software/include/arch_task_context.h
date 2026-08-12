@@ -8,4 +8,10 @@
 // Context using <ucontext.h>
 typedef ucontext_t TaskContext;
 
+// Task critical section state for keeping track of nested call for critical_enter and critical_exit
+typedef struct {
+    uint32_t nesting_count;
+    sigset_t mask;
+} TaskCritical;
+
 #endif

@@ -83,7 +83,8 @@ TaskContainer* _scheduler_find_next() {
 void _scheduler_idle_task() {
     // Does nothing
     while (1) {
-        scheduler_next();
+        // If the quantum is passed, go to the next function
+        task_check_preemption();
     }
 }
 
@@ -92,7 +93,7 @@ void _scheduler_idle_task() {
 //// Functions implementations ////
 
 // Initialize scheduler with an idle task that does nothing
-void scheduler_init() {
+void scheduler_init() { 
     // Add the idle task
     task_add(&_scheduler_idle_task, NULL, LOWEST_PRIORITY, NULL);
 }
@@ -131,10 +132,10 @@ void scheduler_next() {
             current_running_task->task.state = TASK_STATE_READY;
         }
 
-        critical_exit();
-        
         // Context switching to scheduler context
         context_switch_to_scheduler(&current_running_task->task);
+        
+        critical_exit();
     }
 }
 
@@ -158,10 +159,7 @@ void scheduler_entry() {
             // Switch from scheduler to the task
             context_switch_from_scheduler(&next_task->task);
         }
-        // Else exit critical
-        else {
-            critical_exit();
-        }
+        critical_exit();
     }
 }
 

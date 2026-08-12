@@ -6,6 +6,8 @@
 
 // Struct that define a task
 typedef struct {
+    // Stack
+    uint8_t stack[STACK_SIZE];
     // Pointer to the task function
     TaskFunction function;
     // Task arguments
@@ -14,12 +16,12 @@ typedef struct {
     uint8_t priority;
     // Context
     TaskContext context;
-    // Stack
-    uint8_t stack[STACK_SIZE];
     // State
     TaskState state;
     // Tick value to wake up after a call to 'task_sleep'
     uint32_t wake_up_tick;
+    // Critical state
+    TaskCritical critical;
 } Task;
 //
 

@@ -15,4 +15,7 @@ uint32_t arch_timer_get_tick();
 // Delay function
 void arch_timer_delay(uint32_t n);
 
+// Consume the preemption flag
+bool arch_timer_consume_preemption_flag();
+
 #endif

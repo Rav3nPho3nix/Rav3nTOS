@@ -6,6 +6,7 @@
 
 /*----- Includes -----*/
 #include "context.h"
+#include "critical_internal.h"
 #include "task_internal.h"
 #include "scheduler_internal.h"
 
@@ -21,6 +22,8 @@
 ucontext_t scheduler_context;
 // Stack of the scheduler
 uint8_t scheduler_stack[STACK_SIZE];
+// Critical section state of the scheduler
+static TaskCritical scheduler_critical;
 /*----------*/
 
 /*----- Internal functions -----*/
@@ -37,9 +40,13 @@ void _context_task_entry() {
 void context_init(Task *task) {
     getcontext(&task->context);
 
+    // Context section
     task->context.uc_stack.ss_sp = task->stack;
     task->context.uc_stack.ss_size = STACK_SIZE;
     task->context.uc_link = &scheduler_context;
+    
+    // Critical section
+    task->critical.nesting_count = 0;
 
     makecontext(&task->context, _context_task_entry, 0);
 }
@@ -50,26 +57,33 @@ void context_scheduler_init() {
     scheduler_context.uc_stack.ss_sp = scheduler_stack;
     scheduler_context.uc_stack.ss_size = STACK_SIZE;
     scheduler_context.uc_link = NULL;
+    
+    scheduler_critical.nesting_count = 0;
+
     makecontext(&scheduler_context, scheduler_entry, 0);
 }
 
 // Switch contexts
 void context_switch(Task *current_task, Task *next_task) {
+    critical_set_critical(&next_task->critical);
     swapcontext(&current_task->context, &next_task->context);
 }
 
 // Switch to the scheduler context from current task
 void context_switch_to_scheduler(Task *current_task) {
+    critical_set_critical(&scheduler_critical);
     swapcontext(&current_task->context, &scheduler_context);
 }
 
 // Switch from scheduler context to the next task
 void context_switch_from_scheduler(Task *next_task) {
+    critical_set_critical(&next_task->critical);
     swapcontext(&scheduler_context, &next_task->context);
 }
 
 // Set context
 void context_set(Task *task) {
+    critical_set_critical(&task->critical);
     setcontext(&task->context);
 }
 /*----------*/

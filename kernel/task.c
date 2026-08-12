@@ -4,6 +4,7 @@
 #include "task_internal.h"
 #include "context.h"
 #include "clock.h"
+#include "clock_internal.h"
 #include "scheduler_internal.h"
 #include "critical.h"
 
@@ -291,6 +292,13 @@ TaskUnpauseStatus task_unpause(TaskId task_id) {
 // Give up the current task to the scheduler
 void task_yield() {
     scheduler_next();
+}
+
+// Check the preemption flag and yield if the quantum is done
+void task_check_preemption(void) {
+    if (clock_consume_preemption_flag()) {
+        scheduler_next();
+    }
 }
 
 ////
