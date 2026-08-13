@@ -15,4 +15,8 @@ uint32_t arch_timer_get_tick();
 // Delay function
 void arch_timer_delay(uint32_t n);
 
+// Start the next quantum cycle
+// Usefull because tasks can pass to the scheduler without waiting to the quantum cycle (with task_sleep, task_yield or task_remove)
+void arch_timer_start_quantum();
+
 #endif

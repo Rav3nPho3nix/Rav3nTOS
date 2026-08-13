@@ -5,14 +5,20 @@
 #include "scheduler_internal.h"
 #include "critical.h"
 #include "context.h"
+#include "context_internal.h"
 #include "task.h"
 #include "config.h"
 
 #include "arch.h"
 
+// Tick counter
 static _Atomic uint32_t tick_count = 0;
 static timer_t timer;
 static bool initialized = false;
+// Store quantum tick value on a variable to check at compilation time if it overflow 2**8
+static uint16_t quantum = QUANTUM_VALUE;
+// Next quantum tick
+static uint32_t next_quantum_tick = 0;
 
 // Signal handler
 void signal_handler(int signal, siginfo_t *info, void *raw_context) {
@@ -29,7 +35,7 @@ void signal_handler(int signal, siginfo_t *info, void *raw_context) {
     }
 
     // If quantum is NOT done
-    if ((tick_count % QUANTUM_VALUE) != 0) {
+    if ((tick_count % next_quantum_tick) != 0) {
         return;
     }
 
@@ -101,4 +107,10 @@ uint32_t arch_timer_get_tick() {
 void arch_timer_delay(uint32_t n) {
     uint32_t start = arch_timer_get_tick();
     while (arch_timer_get_tick() - start < n);
+}
+
+// Start the next quantum cycle
+// Usefull because tasks can pass to the scheduler without waiting to the quantum cycle (with task_sleep, task_yield or task_remove)
+void arch_timer_start_quantum() {
+    next_quantum_tick = tick_count + quantum;
 }

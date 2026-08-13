@@ -3,7 +3,9 @@
 #include "task.h"
 #include "task_internal.h"
 #include "context.h"
+#include "context_internal.h"
 #include "clock.h"
+#include "clock_internal.h"
 #include "critical.h"
 
 //// Typedef ////
@@ -17,7 +19,6 @@ static TaskContainer *current_running_task = NULL;
 
 // Boolean that store if scheduling is enabled
 static bool scheduler_started = false;
-
 ////
 
 //// Internal functions ////
@@ -153,6 +154,9 @@ void scheduler_entry() {
             next_task->task.state = TASK_STATE_RUNNING;
             // Set it as the currently running one
             current_running_task = next_task;
+
+            // Start quantum for the task
+            clock_start_quantum();
 
             // Switch from scheduler to the task
             context_switch_from_scheduler(&next_task->task);
