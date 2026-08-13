@@ -22,7 +22,7 @@
 
 /*----- Global variables -----*/
 // Counter of nested calls
-static uint32_t nesting_count = 0;
+static uint8_t nesting_count = 0;
 // Mask
 static sigset_t mask;
 

@@ -16,7 +16,7 @@ Priorities :
 
 // Typedef for TaskId
 typedef struct {
-    uint32_t id;
+    uint8_t id;
 } TaskId;
 
 // Typedef that define the function parameters

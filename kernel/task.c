@@ -34,8 +34,8 @@ void _task_make_available(TaskContainer *ptr_task) {
 }
 
 // Find next available task
-uint32_t _task_find_next_available() {
-    uint32_t i=0;
+uint8_t _task_find_next_available() {
+    uint8_t i=0;
     // Loop while the next task pointer is not NULL
     while (i < NUMBER_OF_TASKS && task_manager.tasks[i].next != NULL) {
         i++;
@@ -46,7 +46,7 @@ uint32_t _task_find_next_available() {
 // Update next available task pointer
 void _task_update_next_available() {
     // Find next available task id
-    uint32_t next_available = _task_find_next_available();
+    uint8_t next_available = _task_find_next_available();
 
     // If the returned id is illegal
     if (next_available == ILLEGAL_TASK_ID) {
@@ -65,7 +65,7 @@ void _task_update_next_available() {
 
 void task_init() {
     // Make all tasks availables
-    for (uint32_t i=0; i<NUMBER_OF_TASKS; i++) {
+    for (uint8_t i=0; i<NUMBER_OF_TASKS; i++) {
         _task_make_available(&task_manager.tasks[i]);
     }
     
@@ -132,7 +132,7 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
     _task_update_next_available();
 
     // Fill his self id in his arguments
-    task->task.args.self_id.id = (uint32_t) (task - task_manager.tasks);
+    task->task.args.self_id.id = (uint8_t) (task - task_manager.tasks);
     // Fill the optional arguments in his arguments
     task->task.args.optional_args = args;
 

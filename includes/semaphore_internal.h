@@ -23,7 +23,8 @@
 // Typedef for a semaphore
 // Contains a counter
 typedef struct {
-    uint32_t _Atomic counter;
+    // 254 tasks can be at the same time accessing a data from a semaphore
+    uint8_t _Atomic counter;
 } Semaphore;
 /*----------*/
 

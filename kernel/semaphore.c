@@ -30,7 +30,7 @@ static Semaphore semaphores[NUMBER_OF_SEMAPHORES];
 /*----- Function implementations -----*/
 // V operation for semaphore of given id
 // Increment the semaphore by value n
-SemaphoreVStatus semaphore_V(uint32_t id, uint32_t n) {
+SemaphoreVStatus semaphore_V(uint32_t id, uint8_t n) {
     // If the id is illegal
     if (id >= ILLEGAL_SEMAPHORE_ID) {
         return SEMAPHORE_V_STATUS_ILLEGAL_ID;
