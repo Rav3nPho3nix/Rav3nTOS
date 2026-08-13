@@ -22,14 +22,14 @@
 
 /*----- Global variables -----*/
 // Counter of nested calls
-uint32_t nesting_count = 0;
+static uint32_t nesting_count = 0;
 // Mask
-sigset_t mask;
+static sigset_t mask;
 
 // Current critical section state
-TaskCritical *current_critical_state = NULL;
+static TaskCritical *current_critical_state = NULL;
 // Critical section state for the kernel main loop (outside of any task)
-TaskCritical kernel_critical_state;
+static TaskCritical kernel_critical_state;
 /*----------*/
 
 /*----- Internal functions -----*/

@@ -15,7 +15,7 @@
 
 //// Global variables ////
 
-TaskManager task_manager;
+static TaskManager task_manager;
 
 ////
 

@@ -14,8 +14,6 @@ static _Atomic uint32_t tick_count = 0;
 static timer_t timer;
 static bool initialized = false;
 
-extern bool scheduler_started;
-
 // Signal handler
 void signal_handler(int signal, siginfo_t *info, void *raw_context) {
     if (signal != TIMER_SIGNAL) {
@@ -26,7 +24,7 @@ void signal_handler(int signal, siginfo_t *info, void *raw_context) {
     atomic_fetch_add_explicit(&tick_count, 1, memory_order_relaxed);
 
     // If the scheduler is not started
-    if (!scheduler_started) {
+    if (!scheduler_is_started()) {
         return;
     }
 

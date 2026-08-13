@@ -16,7 +16,7 @@
 static TaskContainer *current_running_task = NULL;
 
 // Boolean that store if scheduling is enabled
-bool scheduler_started = false;
+static bool scheduler_started = false;
 
 ////
 
@@ -166,6 +166,11 @@ Task* scheduler_get_current_task() {
         return NULL;
     }
     return &current_running_task->task;
+}
+
+// Getter to know if the scheduler is started
+bool scheduler_is_started() {
+    return scheduler_started;
 }
 
 ////

@@ -32,7 +32,7 @@ static Semaphore semaphores[NUMBER_OF_SEMAPHORES];
 // Increment the semaphore by value n
 SemaphoreVStatus semaphore_V(uint32_t id, uint32_t n) {
     // If the id is illegal
-    if (id > ILLEGAL_SEMAPHORE_ID) {
+    if (id >= ILLEGAL_SEMAPHORE_ID) {
         return SEMAPHORE_V_STATUS_ILLEGAL_ID;
     }
 
@@ -53,10 +53,12 @@ SemaphorePStatus semaphore_P(uint32_t id) {
         return SEMAPHORE_P_STATUS_ILLEGAL_ID;
     }
 
-    critical_enter();
+    // The task that wait for the semaphore to be available sleep 1 tick to pass to the scheduler
+    while (semaphores[id].counter == 0) {
+        task_sleep(1);
+    }
     
-    while (semaphores[id].counter == 0);
-
+    critical_enter();
     // Decrement the counter
     semaphores[id].counter--;
     critical_exit();

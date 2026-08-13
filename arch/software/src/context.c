@@ -20,9 +20,9 @@
 
 /*----- Global variables -----*/
 // Context of the scheduler
-ucontext_t scheduler_context;
+static ucontext_t scheduler_context;
 // Stack of the scheduler
-uint8_t scheduler_stack[STACK_SIZE];
+static uint8_t scheduler_stack[STACK_SIZE];
 // Critical section state of the scheduler
 static TaskCritical scheduler_critical;
 /*----------*/

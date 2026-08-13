@@ -11,6 +11,7 @@
 
 /*----- Includes -----*/
 #include "task_internal.h"
+#include <stdbool.h>
 /*----------*/
 
 /*----- Defines -----*/
@@ -30,6 +31,9 @@ void scheduler_entry();
 
 // Getter for the current task
 Task* scheduler_get_current_task();
+
+// Getter to know if the scheduler is started
+bool scheduler_is_started();
 /*----------*/
 
 /*----- End of include guards -----*/
