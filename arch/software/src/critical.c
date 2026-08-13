@@ -42,6 +42,7 @@ TaskCritical kernel_critical_state;
 // Must be called first by the kernel
 void critical_init() {
     kernel_critical_state.nesting_count = 0;
+    sigemptyset(&kernel_critical_state.mask);
     current_critical_state = &kernel_critical_state;
 }
 
@@ -78,5 +79,18 @@ void critical_exit() {
 // Set the new critical section state (contain the nesting counter and the masks)
 void critical_set_critical(TaskCritical *critical) {
     current_critical_state = critical;
+
+    sigset_t timer_mask;
+    sigemptyset(&timer_mask);
+    sigaddset(&timer_mask, TIMER_SIGNAL);
+
+    // If the task we are switching to was inside a critical section, we keep blocking
+    if (critical->nesting_count > 0) {
+        sigprocmask(SIG_BLOCK, &timer_mask, NULL);
+    }
+    // Else we unblock
+    else {
+        sigprocmask(SIG_UNBLOCK, &timer_mask, NULL);
+    }
 }
 /*----------*/

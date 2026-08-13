@@ -82,10 +82,7 @@ TaskContainer* _scheduler_find_next() {
 // Idle task function
 void _scheduler_idle_task() {
     // Does nothing
-    while (1) {
-        // If the quantum is passed, go to the next function
-        task_check_preemption();
-    }
+    while (1);
 }
 
 ////
@@ -99,25 +96,27 @@ void scheduler_init() {
 }
 
 void scheduler_start() {
-    // Start scheduling
-    scheduler_started = true;
-
     // Initialize scheduler context
     context_scheduler_init();
 
     // Find first task
     TaskContainer *task = _scheduler_find_next();
 
-    // If there is a task, use his context
-    if (task) {
-        current_running_task = task;
-
-        critical_enter();
-        task->task.state = TASK_STATE_RUNNING;
-        critical_exit();
-
-        context_set(&task->task);
+    // If there is no task
+    if (!task) {
+        return;
     }
+    current_running_task = task;
+
+    critical_enter();
+    task->task.state = TASK_STATE_RUNNING;
+    critical_exit();
+
+    // Start scheduling
+    scheduler_started = true;
+
+    // Start first task
+    context_set(&task->task);
 }
 
 void scheduler_next() {
@@ -143,7 +142,6 @@ void scheduler_next() {
 void scheduler_entry() {
     // Loop indefinitely
     while (1) {
-
         critical_enter();
 
         // Find next task
@@ -164,6 +162,9 @@ void scheduler_entry() {
 }
 
 Task* scheduler_get_current_task() {
+    if (!current_running_task) {
+        return NULL;
+    }
     return &current_running_task->task;
 }
 

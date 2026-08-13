@@ -4,7 +4,6 @@
 #include "task_internal.h"
 #include "context.h"
 #include "clock.h"
-#include "clock_internal.h"
 #include "scheduler_internal.h"
 #include "critical.h"
 
@@ -89,6 +88,7 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
 
     // If there is no next available task
     if (!task_manager.available) {
+        critical_exit();    
         // return error value
         return TASK_ADD_STATUS_NO_AVAILABLE_TASK;
     }
@@ -136,19 +136,19 @@ TaskAddStatus task_add(TaskFunction function, void *args, uint8_t priority, Task
     // Fill the optional arguments in his arguments
     task->task.args.optional_args = args;
 
-    // Set his state
-    task->task.state = TASK_STATE_READY;
-
     // If a TaskId pointer was given (for example, the idle task does not give this pointer)
     if (task_id) {
         // Change the pointed value as his own id
         task_id->id = task->task.args.self_id.id;
     }
-
-    critical_exit();
-
+    
     // Initialize his context
     context_init(&task->task);
+    
+    // Set his state
+    task->task.state = TASK_STATE_READY;
+
+    critical_exit();
 
     return TASK_ADD_STATUS_OK;
 }
@@ -298,13 +298,6 @@ TaskUnpauseStatus task_unpause(TaskId task_id) {
 // Give up the current task to the scheduler
 void task_yield() {
     scheduler_next();
-}
-
-// Check the preemption flag and yield if the quantum is done
-void task_check_preemption() {
-    if (clock_consume_preemption_flag()) {
-        scheduler_next();
-    }
 }
 
 ////

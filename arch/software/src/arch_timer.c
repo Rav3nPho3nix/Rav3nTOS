@@ -4,6 +4,7 @@
 #include "scheduler.h"
 #include "scheduler_internal.h"
 #include "critical.h"
+#include "context.h"
 #include "task.h"
 #include "config.h"
 
@@ -13,12 +14,10 @@ static _Atomic uint32_t tick_count = 0;
 static timer_t timer;
 static bool initialized = false;
 
-static volatile sig_atomic_t preemption_pending = 0;
-
 extern bool scheduler_started;
 
 // Signal handler
-void signal_handler(int signal) {
+void signal_handler(int signal, siginfo_t *info, void *raw_context) {
     if (signal != TIMER_SIGNAL) {
         return;
     }
@@ -26,11 +25,29 @@ void signal_handler(int signal) {
     // Increment tick counter
     atomic_fetch_add_explicit(&tick_count, 1, memory_order_relaxed);
 
-    // If scheduler is enabled AND quantum is done
-    if (scheduler_started && (tick_count % QUANTUM_VALUE) == 0) {
-        // Set the preemption boolean
-        preemption_pending = 1;
+    // If the scheduler is not started
+    if (!scheduler_started) {
+        return;
     }
+
+    // If quantum is NOT done
+    if ((tick_count % QUANTUM_VALUE) != 0) {
+        return;
+    }
+
+    // Currently running task
+    Task *current_task = scheduler_get_current_task();
+
+    // If there is no running task
+    if (!current_task) {
+        return;
+    }
+
+    // Set as READY the task
+    current_task->state = TASK_STATE_READY;
+
+    // Preempt
+    context_preempt(current_task, (ucontext_t*) raw_context);
 }
 
 // Initialize timer
@@ -43,9 +60,9 @@ void arch_timer_init(uint32_t ticks) {
     // Initialisation of signal handler
     struct sigaction action;
     memset(&action, 0, sizeof(action));
-    action.sa_handler = signal_handler;
+    action.sa_sigaction = signal_handler;
     sigemptyset(&action.sa_mask);
-    action.sa_flags = 0;
+    action.sa_flags = SA_SIGINFO;
 
     if (sigaction(TIMER_SIGNAL, &action, NULL) == -1) {
         return;
@@ -85,17 +102,5 @@ uint32_t arch_timer_get_tick() {
 // Delay function
 void arch_timer_delay(uint32_t n) {
     uint32_t start = arch_timer_get_tick();
-    while (arch_timer_get_tick() - start < n) {
-        // Check if the quantum is passed to pass to the scheduler
-        task_check_preemption();
-    }
-}
-
-// Consume the preemption flag
-bool arch_timer_consume_preemption_flag() {
-    if (preemption_pending) {
-        preemption_pending = 0;
-        return true;
-    }
-    return false;
+    while (arch_timer_get_tick() - start < n);
 }

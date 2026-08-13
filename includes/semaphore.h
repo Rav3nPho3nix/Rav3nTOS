@@ -38,12 +38,12 @@ typedef enum {
 /*----- Function signatures -----*/
 // V operation for semaphore of given id
 // Increment the semaphore by value n
-SemaphoreVStatus semaphore_v(uint32_t id, uint32_t n);
+SemaphoreVStatus semaphore_V(uint32_t id, uint32_t n);
 
 // P operation for semaphore of given id
 // Try to decrease the semaphore by 1
 // If the semaphore is already to zero, it wait until it can decrement it
-SemaphorePStatus semaphore_p(uint32_t id);
+SemaphorePStatus semaphore_P(uint32_t id);
 /*----------*/
 
 /*----- End of include guards -----*/

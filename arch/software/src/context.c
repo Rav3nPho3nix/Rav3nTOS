@@ -9,6 +9,7 @@
 #include "critical_internal.h"
 #include "task_internal.h"
 #include "scheduler_internal.h"
+#include "arch_timer.h"
 
 #include "arch.h"
 /*----------*/
@@ -27,6 +28,7 @@ static TaskCritical scheduler_critical;
 /*----------*/
 
 /*----- Internal functions -----*/
+// Entry point for any task
 void _context_task_entry() {
     Task *task = scheduler_get_current_task();
     if (task) {
@@ -44,9 +46,11 @@ void context_init(Task *task) {
     task->context.uc_stack.ss_sp = task->stack;
     task->context.uc_stack.ss_size = STACK_SIZE;
     task->context.uc_link = &scheduler_context;
-    
+
+    sigemptyset(&task->context.uc_sigmask);
     // Critical section
     task->critical.nesting_count = 0;
+    sigemptyset(&task->critical.mask);
 
     makecontext(&task->context, _context_task_entry, 0);
 }
@@ -58,7 +62,9 @@ void context_scheduler_init() {
     scheduler_context.uc_stack.ss_size = STACK_SIZE;
     scheduler_context.uc_link = NULL;
     
+    sigemptyset(&scheduler_context.uc_sigmask);
     scheduler_critical.nesting_count = 0;
+    sigemptyset(&scheduler_critical.mask);
 
     makecontext(&scheduler_context, scheduler_entry, 0);
 }
@@ -85,5 +91,11 @@ void context_switch_from_scheduler(Task *next_task) {
 void context_set(Task *task) {
     critical_set_critical(&task->critical);
     setcontext(&task->context);
+}
+
+// Save the context of the current interrupted task then preempt
+void context_preempt(Task *task, TaskContext *context) {
+    critical_set_critical(&scheduler_critical);
+    swapcontext(&task->context, &scheduler_context);
 }
 /*----------*/

@@ -97,7 +97,4 @@ TaskUnpauseStatus task_unpause(TaskId task_id);
 // Give up the current task to the scheduler
 void task_yield();
 
-// Check the preemption flag and yield if the quantum is done
-void task_check_preemption();
-
 #endif

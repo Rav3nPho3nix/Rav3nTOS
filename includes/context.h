@@ -22,4 +22,7 @@ void context_switch_from_scheduler(Task *next_task);
 // Set context
 void context_set(Task *task);
 
+// Save the context of the current interrupted task then preempt
+void context_preempt(Task *task, TaskContext *context);
+
 #endif
