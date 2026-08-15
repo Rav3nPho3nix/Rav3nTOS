@@ -8,7 +8,7 @@ My perception of this project is simple : i will use to the "software" mode to p
 
 This RTOS is also a great way for me to understand deeply each scheduling algorithm (i will try to implement each one the cleanest way possible, it's a promise ;)).
 
-Currently, my RTOS is in a really early stage, so every modification will only be done on the "software" version. It's much simplier since i can use every C standard library (for example using `printf` for fast debugging the execution of my code). There will be later a function for the `console` service that will accept like `printf` format printing.
+Currently, my RTOS is in a really early stage, so every modification will only be done on the "software" version. It's much simplier since i can use every C standard library.
 
 # ToDo
 - [X] Linker
@@ -19,21 +19,18 @@ Currently, my RTOS is in a really early stage, so every modification will only b
 - [X] Task structure
 - [X] Context switching
 - [X] Round robin (with priorities)
-- [ ] Struct for task arguments
-- [ ] Waiting task
+- [X] Struct for task arguments
+- [X] Paused task
 - [X] Sleeping task
-- [ ] Merge all #define in config.h
-- [ ] Critical sections
-- [ ] Semaphores
+- [X] Task yield
+- [X] Critical sections
+- [X] Merge all #define in config.h
+- [X] Modifying quantum value while running (for a task that yield for example)
+- [X] Semaphores
+- [ ] Config file with static assertions
 - [ ] Mutexes
 - [ ] Communication between tasks
-
-(Maybe)
-- [ ] Microkernel
-- [ ] MPU Isolation
-- [ ] Sandboxing
-- [ ] Stack canaries
-- [ ] EDF Scheduler
+- [ ] Random
 
 # Requirements
 - Docker
@@ -52,11 +49,12 @@ To simplify compilation and deploiement, i use this list of technologies :
 # Setting up Docker image
 
 First, you need to build the Dockerfile into a docker image.
+You can modify the content of the Dockerfile to remove unecessary packages to drastically reduce the final image size.
 
 <em>I recommand to set the docker image name as `rav3ntos_dev`, however if you really want to apply another name, you will need to also modify the `image` value inside the `compose.yaml` file.</em>
 
 ```bash
-docker build -t rav3ntos_dev .
+docker build --file DOCKER_FILE_NAME -t rav3ntos_dev .
 ```
 
 # Compilation
