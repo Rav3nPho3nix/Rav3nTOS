@@ -33,6 +33,9 @@ typedef struct {
 // Note: this does NOT protect the data pointed to by optional_args itself.
 typedef void (*TaskFunction) (TaskArgs args);
 
+// Opaque typedef for Task
+typedef struct Task_s Task;
+
 // Enum that defines task state
 typedef enum {
     TASK_STATE_READY = 0,

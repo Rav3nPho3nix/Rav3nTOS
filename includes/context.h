@@ -1,7 +1,7 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
-#include "task_internal.h"
+#include "task.h"
 
 // Initialize context
 void context_init(Task *task);

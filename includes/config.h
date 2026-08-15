@@ -2,7 +2,8 @@
 #define CONFIG_H
 
 // Must fit in 8 bits
-#define NUMBER_OF_TASKS 256
+// Maximum value of 255
+#define NUMBER_OF_TASKS 255
 
 // Number of priorities for tasks
 // To do a priority-free scheduling, just set it as 1

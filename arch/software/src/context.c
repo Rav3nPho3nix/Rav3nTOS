@@ -5,10 +5,10 @@
 */
 
 /*----- Includes -----*/
+#include "task_internal.h"
 #include "context.h"
 #include "context_internal.h"
 #include "critical_internal.h"
-#include "task_internal.h"
 #include "scheduler_internal.h"
 #include "arch_timer.h"
 

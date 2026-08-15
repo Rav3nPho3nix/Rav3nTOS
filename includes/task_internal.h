@@ -5,7 +5,7 @@
 #include "arch_task_context.h"
 
 // Struct that define a task
-typedef struct {
+struct Task_s {
     // Stack
     uint8_t stack[STACK_SIZE];
     // Pointer to the task function
@@ -22,7 +22,7 @@ typedef struct {
     uint32_t wake_up_tick;
     // Critical state
     TaskCritical critical;
-} Task;
+};
 //
 
 // Struct that contain a task
