@@ -38,7 +38,9 @@ LD = gcc
 # ADD_CFLAGS = -g -ffreestanding -nostdlib -mcpu=cortex-m33 -mthumb
 # ADD_LDFLAGS = -nostdlib -T $(BSP_SRC_DIR)/linker.ld
 ADD_CFLAGS =
-ADD_LDFLAGS = 
+ADD_LDFLAGS =
+# ADD_CFLAGS = -fsanitize=address -fno-omit-frame-pointer -g
+# ADD_LDFLAGS = -fsanitize=address
 
 # Default flags
 CFLAGS = -O0 $(ADD_CFLAGS) $(INCLUDES)
@@ -52,9 +54,11 @@ SRCS = \
 	kernel/task.c \
 	kernel/scheduler.c \
 	kernel/printf.c \
+	kernel/semaphore.c \
 	\
 	$(ARCH_SRC_DIR)/arch_timer.c \
 	$(ARCH_SRC_DIR)/context.c \
+	$(ARCH_SRC_DIR)/critical.c \
 	\
 	$(BSP_SRC_DIR)/putchar.c \
 	\
