@@ -33,7 +33,7 @@ void signal_handler(int signal, siginfo_t *info, void *raw_context) {
     }
 
     // If quantum is NOT done
-    if ((tick_count % next_quantum_tick) != 0) {
+    if (tick_count < next_quantum_tick) {
         return;
     }
 
