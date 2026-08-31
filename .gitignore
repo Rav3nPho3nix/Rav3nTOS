@@ -56,3 +56,6 @@ dkms.conf
 
 # Valgrind files
 vgcore.*
+
+# Dockerfile (copied with the 'docker.sh' script)
+Dockerfile
