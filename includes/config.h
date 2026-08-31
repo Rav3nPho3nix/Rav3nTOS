@@ -2,8 +2,9 @@
 #define CONFIG_H
 
 // Must fit in 8 bits
-// Maximum value of 255
-#define NUMBER_OF_TASKS 255
+// Minimum value of 1 (only for the idle task)
+// Maximum value of 254
+#define NUMBER_OF_TASKS 15
 
 // Number of priorities for tasks
 // To do a priority-free scheduling, just set it as 1

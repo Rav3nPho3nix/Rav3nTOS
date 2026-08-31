@@ -50,6 +50,8 @@ LDFLAGS = $(ADD_LDFLAGS)
 # Sources files
 SRCS = \
 	kernel/main.c \
+	kernel/config.c \
+	\
 	kernel/clock.c \
 	kernel/task.c \
 	kernel/scheduler.c \
